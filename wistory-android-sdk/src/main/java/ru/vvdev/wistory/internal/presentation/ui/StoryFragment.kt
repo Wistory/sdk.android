@@ -1,0 +1,802 @@
+package ru.vvdev.wistory.internal.presentation.ui
+
+import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.drawable.Drawable
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.annotation.RequiresApi
+import androidx.constraintlayout.widget.ConstraintSet
+import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.DrawableImageViewTarget
+import com.bumptech.glide.request.target.Target
+import com.google.android.exoplayer2.util.Util
+import kotlinx.android.synthetic.main.wistory_fragment.*
+import ru.vvdev.wistory.R
+import ru.vvdev.wistory.UiConfig
+import ru.vvdev.wistory.internal.data.models.OptionModel
+import ru.vvdev.wistory.internal.data.models.SnapCounter
+import ru.vvdev.wistory.internal.data.models.SnapModel
+import ru.vvdev.wistory.internal.data.models.Story
+import ru.vvdev.wistory.internal.data.models.StoryVotingAttr
+import ru.vvdev.wistory.internal.domain.events.ReadStoryEvent
+import ru.vvdev.wistory.internal.domain.events.VoteEvent
+import ru.vvdev.wistory.internal.domain.events.FavoriteEvent
+import ru.vvdev.wistory.internal.domain.events.NavigateEvent
+import ru.vvdev.wistory.internal.domain.events.RelationEvent
+import ru.vvdev.wistory.internal.domain.events.StoryCompleteEvent
+import ru.vvdev.wistory.internal.domain.events.StoryNextEvent
+import ru.vvdev.wistory.internal.presentation.callback.ItemSelected
+import ru.vvdev.wistory.internal.presentation.callback.StoryFragmentCallback
+import ru.vvdev.wistory.internal.presentation.callback.StoryTouchListener
+import ru.vvdev.wistory.internal.presentation.utils.ProgressTarget
+import ru.vvdev.wistory.internal.presentation.videoplayer.VideoPlayer
+import ru.vvdev.wistory.internal.presentation.views.StoryStatusView
+import ru.vvdev.wistory.internal.presentation.views.extentions.parseHexColor
+import ru.vvdev.wistory.internal.presentation.views.extentions.setColor
+
+internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListener,
+    VideoPlayer.VideoPlayerCallBack,
+    ItemSelected, SnapCounter {
+
+    private var list = mutableListOf<OptionModel>()
+    private var isFragmentEnabled = false
+    private var target: ProgressTarget<String, Drawable>? = null
+    private var counter = 0
+    private var statusResources: MutableList<String> = mutableListOf()
+    private lateinit var story: Story
+    private lateinit var uiConfig: UiConfig
+    private var storyPlayAgain = false
+    private var typeStory = TypeStory.IMAGE_TYPE
+    private var videoPrepared = false
+    private var videoPlayer: VideoPlayer? = null
+    private var storyFragmentCallback: StoryFragmentCallback? = null
+
+    private val options = RequestOptions()
+        .skipMemoryCache(false)
+        .transform(CenterCrop())
+        .diskCacheStrategy(DiskCacheStrategy.ALL)
+
+    companion object {
+        private const val ARG_STORY = "STORY"
+        private const val ARG_STORY_POSITION = "POS"
+        private const val ARG_STORY_SETTINGS = "SETTINGS"
+        private const val STORY_FIXED_RATIO = "9:14.7"
+        private const val STORY_RELATION_LIKE = "like"
+        private const val STORY_RELATION_DISLIKE = "dislike"
+        private const val STATUSBAR_VERTICAL_BOTTOM_BIAS = 0.97f
+        private const val STATUSBAR_VERTICAL_TOP_BIAS = 0.04f
+        private const val statusMargin: Int = 16
+        private const val buttonMargin: Int = 24
+        private const val buttonBetaMargin: Int = 96
+
+        fun newInstance(
+            story: Story,
+            settings: UiConfig? = null,
+            pos: Int
+        ): StoryFragment {
+            val args = Bundle()
+            args.putSerializable(ARG_STORY, story)
+            args.putSerializable(ARG_STORY_POSITION, pos)
+            args.putSerializable(ARG_STORY_SETTINGS, settings)
+            val fragment = StoryFragment()
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.wistory_fragment, container, false)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        close.setOnClickListener {
+            requireActivity().finish()
+        }
+
+        val touchListener = object : StoryTouchListener(requireContext()) {
+
+            override fun onCLickLeft(): Boolean {
+                storiesStatus.reverse()
+                return true
+            }
+
+            override fun onCLickRight(): Boolean {
+                storiesStatus.skip()
+                return true
+            }
+
+            override fun onCLickStop(): Boolean {
+                if (image.drawable != null || videoPlayer?.isPlaying() == true)
+                    storyPlayAgain = true
+                if (typeStory == TypeStory.VIDEO_TYPE)
+                    videoPlayer?.pause()
+                storiesStatus.pause()
+                return true
+            }
+
+            override fun onResume(): Boolean {
+                if (storyPlayAgain) {
+                    if (typeStory == TypeStory.VIDEO_TYPE)
+                        videoPlayer?.play()
+                    storiesStatus?.resume()
+                    storyPlayAgain = false
+                }
+                return true
+            }
+
+            override fun onSwipeTop(): Boolean {
+                requireActivity().finish()
+                return true
+            }
+
+            override fun onSwipeBottom(): Boolean {
+                requireActivity().finish()
+                return true
+            }
+        }
+
+        reverse.setOnTouchListener(touchListener)
+        skip.setOnTouchListener(touchListener)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (activity is StoryFragmentCallback) {
+            storyFragmentCallback = activity as StoryFragmentCallback
+        }
+
+        if (isFragmentEnabled)
+            readStory()
+    }
+
+    override fun onComplete() {
+        createStoryView()
+        storyFragmentCallback?.storyEvent(StoryCompleteEvent())
+    }
+
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
+    override fun onPrev() {
+        storiesStatus.pause()
+        if (getCurrentSnap() - 1 < 0) {
+            Handler().postDelayed({
+                storiesStatus.resume()
+            }, 300)
+            if (typeStory == TypeStory.VIDEO_TYPE && videoPlayer?.isPlaying() == true) {
+                videoPlayer?.seekTo(0)
+            }
+            return
+        }
+        decrementSnapCounter()
+        setValues(story, uiConfig)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
+    override fun onNext() {
+        storiesStatus.pause()
+        incrementSnapCounter()
+        setValues(story, uiConfig)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (storiesStatus != null)
+            storiesStatus.destroy()
+    }
+
+    private fun setFormat(format: UiConfig.Format) {
+        val constraintSet = ConstraintSet()
+        constraintSet.clone(baseLayout)
+        constraintSet.connect(cardview.id, ConstraintSet.TOP, baseLayout.id, ConstraintSet.TOP)
+        constraintSet.connect(cardview.id, ConstraintSet.LEFT, baseLayout.id, ConstraintSet.LEFT)
+        constraintSet.connect(cardview.id, ConstraintSet.RIGHT, baseLayout.id, ConstraintSet.RIGHT)
+        if (format == UiConfig.Format.FIXED) {
+            constraintSet.setDimensionRatio(cardview.id, STORY_FIXED_RATIO)
+            constraintSet.clear(cardview.id, ConstraintSet.BOTTOM)
+        } else {
+            constraintSet.connect(
+                cardview.id,
+                ConstraintSet.BOTTOM,
+                baseLayout.id,
+                ConstraintSet.BOTTOM
+            )
+        }
+
+        storiesStatus.setPadding(pxToDp(statusMargin), 0, pxToDp(statusMargin), 0)
+        llClose.setPadding(pxToDp(statusMargin), 0, 0, 0)
+
+        constraintSet.applyTo(baseLayout)
+    }
+
+    private fun setTheme(model: SnapModel) {
+        model.apply {
+            themeConfig.let { theme ->
+                if (model.enableGradient) {
+                    resources.apply {
+                        if (theme == UiConfig.Theme.LIGHT) {
+                            context?.let {
+                                gradient.background =
+                                    resources.getDrawable(R.drawable.wistory_gradient_dark)
+                                footer.setColor(it, R.color.wistory_black)
+                            }
+                            colorButton(ColorStateList.valueOf(resources.getColor(R.color.wistory_white)))
+                        } else {
+                            context?.let {
+                                gradient.background =
+                                    resources.getDrawable(R.drawable.wistory_gradient_lignt)
+                                footer.setColor(it, R.color.wistory_white)
+                            }
+                            colorButton(ColorStateList.valueOf(resources.getColor(R.color.wistory_black)))
+                        }
+                    }
+                } else {
+                    resources.apply {
+                        context?.let {
+                            gradient.background = getDrawable(android.R.color.transparent)
+                            footer.setColor(it, R.color.wistory_black)
+                        }
+                        colorButton(ColorStateList.valueOf(resources.getColor(R.color.wistory_white)))
+                    }
+                }
+
+                if (theme == UiConfig.Theme.DARK) {
+                    action_button.backgroundTintList =
+                        ColorStateList.valueOf(resources.getColor(R.color.wistory_black))
+                    action_button.setTextColor(ColorStateList.valueOf(resources.getColor(R.color.wistory_white)))
+                    close.imageTintList =
+                        ColorStateList.valueOf(resources.getColor(R.color.wistory_black))
+                } else {
+                    action_button.backgroundTintList =
+                        ColorStateList.valueOf(resources.getColor(R.color.wistory_white))
+                    action_button.setTextColor(ColorStateList.valueOf(resources.getColor(R.color.wistory_black)))
+                    close.imageTintList =
+                        ColorStateList.valueOf(resources.getColor(R.color.wistory_white))
+                }
+            }
+        }
+    }
+
+    private fun colorButton(color: ColorStateList) {
+        if (like.imageTintList != ColorStateList.valueOf(resources.getColor(R.color.wistory_gray)))
+            like.imageTintList = color
+        if (dislike.imageTintList != ColorStateList.valueOf(resources.getColor(R.color.wistory_gray)))
+            dislike.imageTintList = color
+        favorite.imageTintList = color
+
+        setupBottomButtons(story, color)
+    }
+
+    private fun setValues(story: Story, uiConfig: UiConfig) {
+        videoPrepared = false
+
+        story.content[getCurrentSnap()].apply {
+
+            uiConfig.statusBarPosition?.let {
+                statusbar?.alignmentConfig = it
+            }
+            setStatusBarConfig(this)
+            setTheme(this)
+            createButton(this)
+            if (vote?.options?.isNotEmpty() == true)
+                setVoteStory(this)
+            else
+                setTextStory(this)
+
+            setFormat(uiConfig.format)
+
+            videoPlayer?.releasePlayer()
+
+            image.let {
+                if (it.contains(".mp4")) {
+                    setVideoContent(it)
+                } else {
+                    setImageContent(it)
+                }
+            }
+        }
+    }
+
+    private fun setupBottomButtons(story: Story, color: ColorStateList) {
+
+        val position: Int = arguments?.getSerializable(ARG_STORY_POSITION) as Int
+
+        setLike(story.relation, color)
+        setFavoriteIcon(story.favorite)
+
+        like.setOnClickListener {
+            updateRelation(story, position, color, STORY_RELATION_LIKE)
+        }
+        dislike.setOnClickListener {
+            updateRelation(story, position, color, STORY_RELATION_DISLIKE)
+        }
+        favorite.setOnClickListener {
+            val isFavorite =
+                favorite.tag == R.drawable.wistory_ic_not_favorite
+            setFavoriteIcon(isFavorite)
+            storyFragmentCallback?.storyEvent(FavoriteEvent(story.apply { favorite = isFavorite }, isFavorite, position))
+        }
+    }
+
+    private fun updateRelation(story: Story, position: Int, color: ColorStateList, relation: String) {
+        setLike(relation, color)
+        storyFragmentCallback?.storyEvent(RelationEvent(story.apply {
+            this.relation = relation
+        }, relation, position))
+    }
+
+    private fun setFavoriteIcon(fav: Boolean) {
+        if (fav) {
+            favorite.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_favorite))
+            favorite.tag = R.drawable.wistory_ic_favorite
+        } else {
+            favorite.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_not_favorite))
+            favorite.tag = R.drawable.wistory_ic_not_favorite
+        }
+    }
+
+    private fun setLike(liked: String, color: ColorStateList) {
+
+        if (liked == "like") {
+            like.imageTintList = color
+            dislike.imageTintList =
+                ColorStateList.valueOf(resources.getColor(R.color.wistory_gray))
+            like.tag = R.drawable.wistory_ic_like
+        } else if (liked == "dislike") {
+            like.imageTintList =
+                ColorStateList.valueOf(resources.getColor(R.color.wistory_gray))
+            dislike.imageTintList = color
+            dislike.tag = R.drawable.wistory_ic_dislike
+        }
+    }
+
+    private fun setVideoContent(content: String) {
+        typeStory = TypeStory.VIDEO_TYPE
+        imageProgressBar.visibility = View.VISIBLE
+        setVideoVisible()
+        videoPlayer?.initializePlayer(content)
+    }
+
+    private fun setImageContent(content: String) {
+        typeStory = TypeStory.IMAGE_TYPE
+        setImageVisible()
+        if (videoPlayer?.isPlaying() == true) {
+            videoPlayer?.pause()
+        }
+        target!!.setModel(content)
+        Glide.with(image.context)
+            .load(content)
+            .apply(options)
+            .into(target!!)
+    }
+
+    private fun startVideo() {
+        try {
+            if (storiesStatus != null) {
+                videoPlayer?.play()
+                imageProgressBar?.visibility = View.INVISIBLE
+                storiesStatus.resume()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun setVideoVisible() {
+        mPlayerView.visibility = View.VISIBLE
+        image.visibility = View.GONE
+    }
+
+    private fun setImageVisible() {
+        image.visibility = View.VISIBLE
+        mPlayerView.visibility = View.GONE
+    }
+
+    private fun createStoryView() {
+        statusResources.clear()
+        clearSnapCounter()
+        try {
+            target = MyProgressTarget(DrawableImageViewTarget(image))
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+        story = requireArguments().getSerializable(ARG_STORY) as Story
+        uiConfig = requireArguments().getSerializable(ARG_STORY_SETTINGS) as UiConfig
+
+        storyFragmentCallback?.storyEvent(StoryNextEvent(story))
+
+        for (s in story.content) {
+            statusResources.add(s.image)
+        }
+
+        var arr = ArrayList<Long>()
+        story.content.forEachIndexed { _, it ->
+            arr.add(if (it.duration.toInt() < 10) 1000 else it.duration.toLong())
+        }
+
+        storiesStatus.setStoriesCountWithDurations(arr.toLongArray())
+        storiesStatus.setUserInteractionListener(this)
+
+        storiesStatus.playStories()
+        storiesStatus.pause()
+
+        setValues(story, uiConfig)
+    }
+
+    private fun setButtonAlignment(alignment: UiConfig.HorizontalAlignment) {
+        action_button.apply {
+            val constraintSet = ConstraintSet()
+            constraintSet.clone(baseLayout)
+            constraintSet.clear(id, ConstraintSet.LEFT)
+            constraintSet.clear(id, ConstraintSet.RIGHT)
+            when (alignment) {
+                UiConfig.HorizontalAlignment.RIGHT -> {
+                    constraintSet.connect(
+                        id,
+                        ConstraintSet.RIGHT,
+                        baseLayout.id,
+                        ConstraintSet.RIGHT,
+                        pxToDp(buttonMargin)
+                    )
+                    constraintSet.connect(
+                        id,
+                        ConstraintSet.LEFT,
+                        baseLayout.id,
+                        ConstraintSet.LEFT,
+                        pxToDp(buttonBetaMargin)
+                    )
+                }
+                UiConfig.HorizontalAlignment.LEFT -> {
+                    constraintSet.connect(
+                        id,
+                        ConstraintSet.LEFT,
+                        baseLayout.id,
+                        ConstraintSet.LEFT,
+                        pxToDp(buttonMargin)
+                    )
+                    constraintSet.connect(
+                        id,
+                        ConstraintSet.RIGHT,
+                        baseLayout.id,
+                        ConstraintSet.RIGHT,
+                        pxToDp(buttonBetaMargin)
+                    )
+                }
+                UiConfig.HorizontalAlignment.CENTER -> {
+                    constraintSet.connect(
+                        id,
+                        ConstraintSet.LEFT,
+                        baseLayout.id,
+                        ConstraintSet.LEFT,
+                        pxToDp(buttonMargin)
+                    )
+                    constraintSet.connect(
+                        id,
+                        ConstraintSet.RIGHT,
+                        baseLayout.id,
+                        ConstraintSet.RIGHT,
+                        pxToDp(buttonMargin)
+                    )
+                }
+            }
+            constraintSet.applyTo(baseLayout)
+        }
+    }
+
+    private fun setStatusBarConfig(snapModel: SnapModel) {
+        storiesStatus.apply {
+            snapModel.statusbar?.apply {
+
+                storiesStatus.updateProgressBar(color)
+
+                val constraintSet = ConstraintSet()
+                constraintSet.clone(baseLayout)
+                when (alignmentConfig) {
+                    UiConfig.VerticalAlignment.TOP -> {
+                        constraintSet.setVerticalBias(id, STATUSBAR_VERTICAL_TOP_BIAS)
+                        constraintSet.connect(llClose.id, ConstraintSet.TOP, id, ConstraintSet.TOP)
+                    }
+                    UiConfig.VerticalAlignment.BOTTOM -> {
+                        constraintSet.setVerticalBias(id, STATUSBAR_VERTICAL_BOTTOM_BIAS)
+                        constraintSet.connect(
+                            llClose.id,
+                            ConstraintSet.TOP,
+                            baseLayout.id,
+                            ConstraintSet.TOP
+                        )
+                    }
+                }
+                constraintSet.applyTo(baseLayout)
+            }
+        }
+    }
+
+    private fun createButton(snap: SnapModel) {
+
+        snap.button?.let { button ->
+            action_button.visibility = View.VISIBLE
+            setButtonAlignment(button.alignmentConfig)
+            action_button.text = button.text
+            action_button.backgroundTintList =
+                ColorStateList.valueOf(button.color.parseHexColor())
+            action_button.setTextColor(
+                ColorStateList.valueOf(button.textColor.parseHexColor())
+            )
+            action_button.setOnClickListener {
+                storyFragmentCallback?.storyEvent(
+                    NavigateEvent(
+                        button.action,
+                        button.value ?: button.valueUrl,
+                        title.toString()
+                    )
+                )
+            }
+        } ?: removeButton()
+    }
+
+    private fun removeButton() {
+        action_button.visibility = View.GONE
+    }
+
+    private fun setVoteStory(snapModel: SnapModel) {
+        snapModel.vote?.run {
+            list = options as MutableList<OptionModel>
+            storyVotingView.apply {
+                visibility = View.VISIBLE
+                setCallback(this@StoryFragment)
+                setVotingViewTheme(
+                    StoryVotingAttr(
+                        snapModel.vote?.title,
+                        snapModel.themeConfig
+                    )
+                )
+                val pos = getCurrentSnap()
+                setVotingViewList(list, voted, story._id, pos, replay)
+            }
+            this@StoryFragment.title.visibility = View.GONE
+            content.visibility = View.GONE
+        }
+    }
+
+    private fun setTextStory(snapModel: SnapModel) {
+        snapModel.textBlock?.let { textItem ->
+            val constraintSet = ConstraintSet()
+            constraintSet.clone(baseLayout)
+
+            when (textItem.alignmentOverlay) {
+                UiConfig.VerticalAlignment.TOP -> {
+                    constraintSet.clear(textBlock.id, ConstraintSet.BOTTOM)
+                    constraintSet.connect(
+                        textBlock.id,
+                        ConstraintSet.TOP,
+                        llClose.id,
+                        ConstraintSet.BOTTOM
+                    )
+                }
+                UiConfig.VerticalAlignment.BOTTOM -> {
+                    constraintSet.clear(textBlock.id, ConstraintSet.TOP)
+                    constraintSet.connect(
+                        textBlock.id,
+                        ConstraintSet.BOTTOM,
+                        action_button.id,
+                        ConstraintSet.TOP
+                    )
+                }
+                UiConfig.VerticalAlignment.CENTER -> {
+                    constraintSet.connect(
+                        textBlock.id,
+                        ConstraintSet.BOTTOM,
+                        action_button.id,
+                        ConstraintSet.TOP
+                    )
+                    constraintSet.connect(
+                        textBlock.id,
+                        ConstraintSet.TOP,
+                        llClose.id,
+                        ConstraintSet.BOTTOM
+                    )
+                }
+            }
+
+            title.visibility = View.VISIBLE
+            content.visibility = View.VISIBLE
+            title.text = textItem.text
+            content.text = textItem.subtext
+
+            textItem.color?.let {
+                ColorStateList.valueOf(Color.parseColor(it)).apply {
+                    title.setTextColor(this)
+                    content.setTextColor(this)
+                }
+            }
+
+            constraintSet.applyTo(baseLayout)
+        } ?: run {
+            title.visibility = View.INVISIBLE
+            content.visibility = View.INVISIBLE
+            title.text = ""
+            content.text = ""
+        }
+        storyVotingView.visibility = View.GONE
+    }
+
+    private fun pxToDp(dps: Int): Int {
+        return (dps * requireContext().resources.displayMetrics.density + 0.5f).toInt()
+    }
+
+    override fun incrementSnapCounter(): Int {
+        return counter++
+    }
+
+    override fun decrementSnapCounter(): Int {
+        return counter--
+    }
+
+    override fun clearSnapCounter() {
+        counter = 0
+    }
+
+    override fun getCurrentSnap() = counter
+
+    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
+
+        isFragmentEnabled = isVisibleToUser
+
+        @RequiresApi(Build.VERSION_CODES.KITKAT)
+        if (isVisibleToUser) {
+            readStory()
+            Handler().postDelayed({
+                if (typeStory == TypeStory.VIDEO_TYPE && videoPlayer?.isPlaying() == false) {
+                    if (videoPrepared)
+                        startVideo()
+                } else {
+                    if (storiesStatus != null && image?.drawable != null) {
+                        storiesStatus.resume()
+                    }
+                }
+            }, 300)
+        } else {
+            Handler().postDelayed({
+                if (storiesStatus != null) {
+                    videoPlayer?.pause()
+                    storiesStatus.pause()
+                }
+            }, 300)
+        }
+    }
+
+    private fun readStory() {
+        val story: Story? = arguments?.getSerializable(ARG_STORY) as Story
+        story?.let {
+            storyFragmentCallback?.run {
+                if (story.fresh) {
+                    story.fresh = false
+                    storyEvent(ReadStoryEvent(story))
+                }
+            }
+        }
+    }
+
+    inner class MyProgressTarget<Z>(target: Target<Z>) : ProgressTarget<String, Z>(target) {
+
+        override val granualityPercentage: Float
+            get() = 0.1f
+
+        @RequiresApi(Build.VERSION_CODES.KITKAT)
+        override fun onConnecting() {
+            if (imageProgressBar != null) {
+                imageProgressBar.isIndeterminate = true
+                imageProgressBar.visibility = View.VISIBLE
+                try {
+                    storiesStatus.pause()
+                } catch (e: Exception) { }
+            }
+        }
+
+        @RequiresApi(Build.VERSION_CODES.KITKAT)
+        override fun onDownloading(bytesRead: Long, expectedLength: Long) {
+            if (imageProgressBar != null) {
+                imageProgressBar.isIndeterminate = false
+                imageProgressBar.progress = (100 * bytesRead / expectedLength).toInt()
+                storiesStatus?.pause()
+            }
+        }
+
+        @RequiresApi(Build.VERSION_CODES.KITKAT)
+        override fun onDownloaded() {
+            if (imageProgressBar != null) {
+                imageProgressBar.isIndeterminate = true
+                storiesStatus?.pause()
+            }
+        }
+
+        @RequiresApi(Build.VERSION_CODES.KITKAT)
+        override fun onDelivered() {
+
+            if (imageProgressBar != null) {
+                imageProgressBar.visibility = View.INVISIBLE
+                if (isFragmentEnabled)
+                    Handler().postDelayed({
+                        storiesStatus?.resume()
+                    }, 300)
+            }
+        }
+    }
+
+    enum class TypeStory {
+        VIDEO_TYPE, IMAGE_TYPE
+    }
+
+    override fun videoBuffering(playWhenReady: Boolean) {}
+
+    override fun videoEnd(playWhenReady: Boolean) {}
+
+    override fun videoIdle(playWhenReady: Boolean) {}
+
+    override fun videoReady(playWhenReady: Boolean) {
+
+        if (isFragmentEnabled && !storyPlayAgain) {
+            startVideo()
+        }
+        videoPrepared = true
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        var storyHaveVideo = false
+        val story = requireArguments().getSerializable(ARG_STORY) as Story
+        story.content.map {
+            if (it.image.contains(".mp4"))
+                storyHaveVideo = true
+        }
+        if (storyHaveVideo) {
+            videoPlayer = VideoPlayer(requireContext(), mPlayerView, this)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        createStoryView()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        storiesStatus?.destroy()
+        videoPlayer?.destroy()
+        if (Util.SDK_INT <= 23) videoPlayer?.releasePlayer()
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        if (Util.SDK_INT > 23) videoPlayer?.releasePlayer()
+        videoPlayer = null
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        if (storiesStatus != null)
+            storiesStatus.destroy()
+    }
+
+    override fun itemSelected(storyId: String, newpoll: String, oldpoll: String, sheet: Int) {
+        story.content[sheet].vote?.voted = newpoll
+        (activity as StoryFragmentCallback).storyEvent(VoteEvent(storyId, newpoll, sheet))
+    }
+}

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="wistory_ss_colorPrimary">#9E9E9E</color>
+    <color name="wistory_ss_colorPrimaryDark">#616161</color>
+    <color name="wistory_ss_colorAccent">#95ff00</color>
+
+    <color name="wistory_ss_progress_startColor_white">#ffffffff</color>
+    <color name="wistory_ss_progress_endColor_white">#ffffffff</color>
+    <color name="wistory_ss_progress_centerColor_white">#ffffffff</color>
+
+    <color name="wistory_ss_secondaryProgress_startColor_white">#80ffffff</color>
+    <color name="wistory_ss_secondaryProgress_endColor_white">#a0ffffff</color>
+    <color name="wistory_ss_secondaryProgress_centerColor_white">#80ffffff</color>
+
+    <color name="wistory_ss_progress_startColor_black">#ff000000</color>
+    <color name="wistory_ss_progress_endColor_black">#ff000000</color>
+    <color name="wistory_ss_progress_centerColor_black">#ff000000</color>
+
+    <color name="wistory_ss_secondaryProgress_startColor_black">#80000000</color>
+    <color name="wistory_ss_secondaryProgress_endColor_black">#a0000000</color>
+    <color name="wistory_ss_secondaryProgress_centerColor_black">#80000000</color>
+
+    <color name="wistory_black">#000</color>
+    <color name="wistory_progress_background_startColor_white">#66FFFFFF</color>
+    <color name="wistory_progress_background_startColor_black">#33000000</color>
+
+    <color name="wistory_tv_dark_gray">#303030</color>
+    <color name="wistory_gray">#80000000</color>
+    <color name="wistory_white32alpha">#C6FFFFFF</color>
+    <color name="wistory_white64alpha">#A6FFFFFF</color>
+    <color name="wistory_white">#FFFFFF</color>
+</resources>

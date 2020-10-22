@@ -1,0 +1,12 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="ru.vvdev.wistory">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="ru.vvdev.wistory.internal.presentation.ui.StoryActivity"/>
+    </application>
+
+</manifest>

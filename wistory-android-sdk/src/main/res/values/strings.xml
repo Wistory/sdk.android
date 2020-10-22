@@ -1,0 +1,4 @@
+<resources>
+    <string name="wistory_example_title">Какой чай вы любите?</string>
+    <string name="wistory_base_url">https://api.wistory.io/</string>
+</resources>

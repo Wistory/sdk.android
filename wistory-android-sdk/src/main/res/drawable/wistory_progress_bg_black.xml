@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@android:id/background">
+        <shape>
+            <corners android:radius="8dip" />
+            <gradient
+                android:angle="270"
+                android:centerColor="@color/wistory_progress_background_startColor_black"
+                android:centerY="0.75"
+                android:endColor="@color/wistory_progress_background_startColor_black"
+                android:startColor="@color/wistory_progress_background_startColor_black" />
+        </shape>
+    </item>
+
+    <itme android:id="@android:id/secondaryProgress">
+        <clip>
+            <shape>
+                <corners android:radius="8dip" />
+                <gradient
+                    android:angle="270"
+                    android:centerColor="@color/wistory_ss_secondaryProgress_startColor_black"
+                    android:centerY="0.75"
+                    android:endColor="@color/wistory_ss_secondaryProgress_startColor_black"
+                    android:startColor="@color/wistory_ss_secondaryProgress_startColor_black" />
+            </shape>
+        </clip>
+    </itme>
+
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape>
+                <corners android:radius="8dip" />
+                <gradient
+                    android:angle="270"
+                    android:centerColor="@color/wistory_ss_progress_centerColor_black"
+                    android:centerY="0.75"
+                    android:endColor="@color/wistory_ss_progress_endColor_black"
+                    android:startColor="@color/wistory_ss_progress_startColor_black" />
+            </shape>
+        </clip>
+    </item>
+
+</layer-list>

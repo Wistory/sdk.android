@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Wistory.StoryActivity" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowSharedElementEnterTransition">
+            @transition/wistory_transition
+        </item>
+
+        <item name="android:windowSharedElementExitTransition">
+            @transition/wistory_transition
+        </item>
+        <item name="android:colorEdgeEffect">@color/wistory_black</item>
+
+    </style>
+
+    <style name="WistoryDialogTheme" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowIsFloating">false</item>
+    </style>
+</resources>

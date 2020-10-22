@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="24.5dp"
+    android:layout_height="24.5dp"
+    android:clickable="false"
+    android:gravity="center">
+
+   <ImageView
+       android:id="@+id/image"
+       android:layout_width="24.5dp"
+       android:layout_height="24.5dp"
+       android:layout_alignParentTop="true"
+       android:adjustViewBounds="false"
+       android:scaleType="centerCrop"
+       android:transitionName="imageTransition"
+       />
+
+   <ImageView
+       android:id="@+id/gradient"
+       android:layout_width="24.5dp"
+       android:layout_height="24.5dp"
+       android:background="@drawable/wistory_gradient_grid_item"
+       android:layout_alignParentTop="true"
+       android:adjustViewBounds="false"
+       android:scaleType="centerCrop"
+       />
+
+</RelativeLayout>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/wistory_black"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    style="@style/WistoryDialogTheme"
+    android:fitsSystemWindows="true">
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:transitionName="imageTransition"
+        android:visibility="gone"
+        android:contentDescription="@null" />
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <LinearLayout
+        android:id="@+id/recyclerViewLayout"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:background="@color/wistory_white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:navigationIcon="@drawable/wistory_ic_close_black"
+            app:title="Избранное"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/wistory_white"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingTop="16dp"
+            android:paddingLeft="24dp"
+            android:paddingRight="16dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/webViewLayout"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbarWebView"
+            android:background="@color/wistory_white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:navigationIcon="@drawable/wistory_ic_close_black"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <WebView
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/wistory_white"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingTop="16dp"
+            android:paddingLeft="24dp"
+            android:paddingRight="16dp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

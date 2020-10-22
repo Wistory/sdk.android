@@ -1,0 +1,5 @@
+# pre-commit hook.
+if git diff --cached --name-only | grep --quiet ""
+then
+    ./gradlew preCommitCheck -q
+fi

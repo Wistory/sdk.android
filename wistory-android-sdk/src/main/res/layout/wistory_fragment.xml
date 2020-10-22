@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/wistory_gray"
+    android:id="@+id/footer">
+
+    <LinearLayout
+        android:id="@+id/navigationActions"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="32dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <View
+            android:id="@+id/reverse"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+
+        <View
+            android:id="@+id/skip"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/baseLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/feelActions"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_centerInParent="true"
+            android:id="@+id/cardview"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardElevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/image"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+
+                    <com.google.android.exoplayer2.ui.PlayerView
+                        android:id="@+id/mPlayerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"
+                        android:background="#A6000000"
+                        android:contentDescription="@null"
+                        app:controller_layout_id="@layout/exo_playback_control_view"
+                        app:player_layout_id="@layout/exo_simple_player_view"
+                        app:repeat_toggle_modes="none"
+                        app:resize_mode="fixed_height"
+                        app:show_timeout="45000"
+                        android:visibility="gone"
+                        app:surface_type="texture_view"
+                        app:use_controller="false"/>
+
+                    <ImageView
+                        android:id="@+id/gradient"
+                        android:layout_width="match_parent"
+                        android:layout_height="300dp"
+                        android:layout_alignParentBottom="true"
+                        android:contentDescription="@null"/>
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/textBlock"
+            android:translationZ="1dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/content"
+                android:textColor="@color/wistory_black"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Text"/>
+
+            <TextView
+                android:id="@+id/content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/wistory_black"
+                android:textSize="20sp"
+                android:layout_marginTop="12dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/title"
+                tools:text="Text"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ProgressBar
+            android:id="@+id/imageProgressBar"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_centerInParent="true"
+            android:max="100"
+            android:progress="0"
+            android:translationZ="1dp"
+            android:visibility="gone"
+            android:progressDrawable="@drawable/wistory_circular_progress"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/storiesStatus"
+            android:paddingLeft="32dp"
+            android:paddingTop="12dp"
+            android:paddingRight="32dp"
+            android:paddingBottom="14dp"
+            android:textSize="16sp"
+            android:translationZ="1dp"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:textAppearance="@style/Widget.MaterialComponents.TextView"
+            app:layout_constraintVertical_bias="0.95"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <ru.vvdev.wistory.internal.presentation.views.StoryStatusView
+            android:id="@+id/storiesStatus"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_marginLeft="9dp"
+            android:layout_marginRight="9dp"
+            android:translationZ="1dp"
+            android:layout_alignParentBottom="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <ru.vvdev.wistory.internal.presentation.views.StoryVotingView
+            android:id="@+id/storyVotingView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/storiesStatus"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:translationZ="1dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <FrameLayout
+            android:id="@+id/llClose"
+            android:translationZ="1dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/storiesStatus">
+
+            <ImageView
+                android:id="@+id/close"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="10dp"
+                android:contentDescription="@null"
+                android:paddingLeft="4dp"
+                android:paddingTop="10dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="10dp"
+                android:src="@drawable/wistory_ic_close"
+                android:tint="#fff"/>
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/feelActions"
+        android:translationZ="1dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="12dp"
+        android:gravity="left|center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/baseLayout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:id="@+id/like"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginRight="16dp"
+            android:padding="2dp"
+            android:tint="@color/wistory_gray"
+            android:src="@drawable/wistory_ic_like"/>
+
+        <ImageView
+            android:id="@+id/dislike"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:padding="2dp"
+            android:tint="@color/wistory_gray"
+            android:src="@drawable/wistory_ic_dislike"/>
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/favorite"
+                android:layout_gravity="right"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:padding="2dp"
+                android:src="@drawable/wistory_ic_dislike"/>
+        </FrameLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,2 @@
+include ':app', ':wistory-android-sdk'
+rootProject.name='StoriesDemo'

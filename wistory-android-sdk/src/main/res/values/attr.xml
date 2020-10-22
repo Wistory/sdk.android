@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <declare-styleable name="WistoryView" tools:ignore="ResourceName">
+        <attr name="format">
+            <enum name="fullscreen" value="0" />
+            <enum name="fixed" value="1" />
+        </attr>
+        <attr name="statusBarAlignment">
+            <enum name="top" value="0" />
+            <enum name="bottom" value="1" />
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="WistoryVotingView" tools:ignore="ResourceName">
+        <attr name="dark" format="boolean" />
+        <attr name="text" format="reference|string" />
+    </declare-styleable>
+</resources>
