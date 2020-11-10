@@ -182,7 +182,9 @@ internal class WistoryListFragment : Fragment(), StoryEventListener,
             flexAdapter.apply {
                 viewModel.storyItems.value?.let {
                     if (currentItemsCount > it.size) {
-                        removeRange(it.size, currentItemsCount - 1)
+                        for (i in it.size until currentItemsCount) {
+                            removeItem(i)
+                        }
                     }
                     list.forEachIndexed { index, story ->
                         val story = if (story.fresh)
@@ -219,7 +221,8 @@ internal class WistoryListFragment : Fragment(), StoryEventListener,
             if (list.isNotEmpty()) {
                 favoriteStoryItem =
                     FavoriteStoryItem(activity, list, this@WistoryListFragment)
-                addItem(favoriteStoryItem!!)
+
+                updateItem(currentItems.size - 1, favoriteStoryItem!!, null)
             }
         }
     }
