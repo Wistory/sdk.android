@@ -18,23 +18,17 @@ import kotlinx.android.synthetic.main.wistory_list_fragment.*
 import ru.vvdev.wistory.R
 import ru.vvdev.wistory.ServerConfig
 import ru.vvdev.wistory.UiConfig
-import ru.vvdev.wistory.Wistory
 import ru.vvdev.wistory.internal.data.models.Story
 import ru.vvdev.wistory.internal.data.network.StoriesApi
 import ru.vvdev.wistory.internal.data.repository.StoriesRepository
-import ru.vvdev.wistory.internal.domain.events.ErrorEvent
-import ru.vvdev.wistory.internal.domain.events.UpdateOnFavoriteEvent
-import ru.vvdev.wistory.internal.domain.events.UpdateOnPollEvent
-import ru.vvdev.wistory.internal.domain.events.UpdateOnReadEvent
-import ru.vvdev.wistory.internal.domain.events.UpdateOnRelationEvent
-import ru.vvdev.wistory.internal.presentation.callback.WistoryCommunication
+import ru.vvdev.wistory.internal.domain.events.*
 import ru.vvdev.wistory.internal.presentation.callback.StoryEventListener
+import ru.vvdev.wistory.internal.presentation.callback.WistoryCommunication
 import ru.vvdev.wistory.internal.presentation.items.FavoriteStoryItem
 import ru.vvdev.wistory.internal.presentation.items.PlaceholderStoryItem
 import ru.vvdev.wistory.internal.presentation.items.ReadedStoryItem
 import ru.vvdev.wistory.internal.presentation.items.StoryItem
 import ru.vvdev.wistory.internal.presentation.viewmodel.WistoryViewModel
-import java.lang.Exception
 
 internal class WistoryListFragment : Fragment(), StoryEventListener,
     StoryItem.OnStoryClickListener {
@@ -182,9 +176,7 @@ internal class WistoryListFragment : Fragment(), StoryEventListener,
             flexAdapter.apply {
                 viewModel.storyItems.value?.let {
                     if (currentItemsCount > it.size) {
-                        for (i in it.size until currentItemsCount) {
-                            removeItem(i)
-                        }
+                        removeRange(it.size, currentItemsCount - it.size)
                     }
                     list.forEachIndexed { index, story ->
                         val story = if (story.fresh)
@@ -209,6 +201,16 @@ internal class WistoryListFragment : Fragment(), StoryEventListener,
             flexAdapter.addItem(story)
     }
 
+    private fun addOrUpdateFavoriteItem(
+        index: Int,
+        story: FavoriteStoryItem
+    ) {
+        if (index < getStoryItemsCount())
+            flexAdapter.updateItem(index, story, null)
+        else
+            flexAdapter.addItem(story)
+    }
+
     private fun getStoryItemsCount(): Int {
         var storyItemsCount = 0
         flexAdapter.currentItems.forEach { if (it is StoryItem || it is PlaceholderStoryItem) storyItemsCount++ }
@@ -222,7 +224,9 @@ internal class WistoryListFragment : Fragment(), StoryEventListener,
                 favoriteStoryItem =
                     FavoriteStoryItem(activity, list, this@WistoryListFragment)
 
-                updateItem(currentItems.size - 1, favoriteStoryItem!!, null)
+                addItem(currentItems.size, favoriteStoryItem!!)
+            } else {
+                favoriteStoryItem = null
             }
         }
     }
