@@ -10,7 +10,7 @@ class UiConfig : Serializable {
 
     var format: Format = Format.FIXED
         set
-    var statusBarPosition: VerticalAlignment? = VerticalAlignment.TOP
+    var statusBarPosition: VerticalAlignment? = null
         set
 
     operator fun invoke(block: UiConfig.() -> Unit): UiConfig = apply(block)
