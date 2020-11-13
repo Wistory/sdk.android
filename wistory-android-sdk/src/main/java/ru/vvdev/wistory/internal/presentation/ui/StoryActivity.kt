@@ -13,6 +13,7 @@ import ru.vvdev.wistory.R
 import ru.vvdev.wistory.UiConfig
 import ru.vvdev.wistory.internal.data.models.Story
 import ru.vvdev.wistory.internal.domain.events.BaseEvent
+import ru.vvdev.wistory.internal.domain.events.NavigateEvent
 import ru.vvdev.wistory.internal.domain.events.StoryCompleteEvent
 import ru.vvdev.wistory.internal.domain.events.UpdateEvent
 import ru.vvdev.wistory.internal.presentation.callback.WistoryCommunication
@@ -180,6 +181,7 @@ internal class StoryActivity : AppCompatActivity(), StoryFragmentCallback,
                 canGoNext()
             }
             is UpdateEvent -> updateStoryValueAtAdapter(event.position, event.story)
+            is NavigateEvent -> finish()
         }
         WistoryCommunication.getInstance().handleEvent(event)
     }
