@@ -12,6 +12,7 @@ internal class WistoryCommunication private constructor() {
     private var callbacks: ArrayList<StoryEventListener> = arrayListOf()
 
     fun addCallBackListener(callback: StoryEventListener) {
+        callbacks.remove(callback)
         callbacks.add(callback)
     }
 

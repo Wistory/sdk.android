@@ -63,10 +63,4 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
 
         swipeToRefresh.isRefreshing = false
     }
-
-    override fun onError(e: Exception) {
-        e
-    }
-
-    override fun onRead(storyId: String) {}
 }
