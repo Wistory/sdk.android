@@ -305,19 +305,6 @@ internal class WistoryListFragment : Fragment(), StoryEventListener,
         viewModel.onFavorite(storyId, favorite)
     }
 
-    override fun onNavigate(action: String, value: String) {
-        when (action) {
-            "browser" -> startActivity(Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse(value)
-            })
-            "webView" ->
-                startActivity(Intent(context, StoryActivity::class.java).apply {
-                    putExtra(StoryActivity.ARG_TYPE, StoryActivity.TYPE_WEBVIEW)
-                    putExtra(StoryActivity.ARG_URL, value)
-                })
-        }
-    }
-
     override fun onStoryClick(position: Int) {
         navigateToStory(position)
     }
