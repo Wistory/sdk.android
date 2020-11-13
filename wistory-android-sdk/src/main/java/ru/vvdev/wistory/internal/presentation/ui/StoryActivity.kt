@@ -1,7 +1,9 @@
 package ru.vvdev.wistory.internal.presentation.ui
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -16,8 +18,8 @@ import ru.vvdev.wistory.internal.domain.events.BaseEvent
 import ru.vvdev.wistory.internal.domain.events.NavigateEvent
 import ru.vvdev.wistory.internal.domain.events.StoryCompleteEvent
 import ru.vvdev.wistory.internal.domain.events.UpdateEvent
-import ru.vvdev.wistory.internal.presentation.callback.WistoryCommunication
 import ru.vvdev.wistory.internal.presentation.callback.StoryFragmentCallback
+import ru.vvdev.wistory.internal.presentation.callback.WistoryCommunication
 import ru.vvdev.wistory.internal.presentation.decorators.GridSpacingItemDecoration
 import ru.vvdev.wistory.internal.presentation.items.PagerAdapter
 import ru.vvdev.wistory.internal.presentation.items.StoryItem
@@ -176,14 +178,27 @@ internal class StoryActivity : AppCompatActivity(), StoryFragmentCallback,
             finish()
 
     override fun storyEvent(event: BaseEvent) {
+        WistoryCommunication.getInstance().handleEvent(event)
+
         when (event) {
             is StoryCompleteEvent -> {
                 canGoNext()
             }
             is UpdateEvent -> updateStoryValueAtAdapter(event.position, event.story)
-            is NavigateEvent -> finish()
+            is NavigateEvent -> {
+                when (event.type) {
+                    "browser" -> startActivity(Intent(Intent.ACTION_VIEW).apply {
+                        data = Uri.parse(event.value)
+                    })
+                    "webView" ->
+                        startActivity(Intent(this, StoryActivity::class.java).apply {
+                            putExtra(ARG_TYPE, TYPE_WEBVIEW)
+                            putExtra(ARG_URL, event.value)
+                        })
+                }
+                Handler().postDelayed({ runOnUiThread { finish() } }, 500)
+            }
         }
-        WistoryCommunication.getInstance().handleEvent(event)
     }
 
     private fun updateStoryValueAtAdapter(position: Int?, story: Story) {
