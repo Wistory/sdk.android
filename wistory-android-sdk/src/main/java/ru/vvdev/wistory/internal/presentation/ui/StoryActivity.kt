@@ -196,7 +196,7 @@ internal class StoryActivity : AppCompatActivity(), StoryFragmentCallback,
                             putExtra(ARG_URL, event.value)
                         })
                 }
-                Handler().postDelayed({ runOnUiThread { finish() } }, 500)
+                finish()
             }
         }
     }
