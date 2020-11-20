@@ -25,10 +25,9 @@ internal class WistoryViewModel(private val storiesRepository: StoriesRepository
 
     init {
         favoriteStoryItems.value = arrayListOf()
-        register()
     }
 
-    private fun register() {
+    fun register() {
         viewModelScope.launch {
             try {
                 when (storiesRepository.register()) {
