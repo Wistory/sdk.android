@@ -87,6 +87,8 @@ internal class WistoryListFragment : Fragment(), StoryEventListener,
         viewModel = ViewModelProviders.of(requireActivity(), ViewModelFactory(StoriesRepository()))
             .get(WistoryViewModel::class.java)
 
+        viewModel.register()
+
         viewModel.storyItems.sub { list ->
             list?.let {
                 setItems(it)

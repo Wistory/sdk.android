@@ -10,8 +10,6 @@ import ru.vvdev.wistory.internal.presentation.callback.StoryEventListener
 
 class MainActivity : AppCompatActivity(), StoryEventListener {
 
-    var token: String? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -21,7 +19,6 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                token = s.run { if (toString() == "") null else toString() }
             }
 
             override fun beforeTextChanged(
@@ -29,7 +26,8 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
                 start: Int,
                 count: Int,
                 after: Int
-            ) {}
+            ) {
+            }
         })
 
         swipeToRefresh.setOnRefreshListener {
@@ -37,7 +35,8 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
         }
 
         swFullscreen.setOnCheckedChangeListener { _, isChecked ->
-            storiesView.config.format = if (isChecked) UiConfig.Format.FULLSCREEN else UiConfig.Format.FIXED
+            storiesView.config.format =
+                if (isChecked) UiConfig.Format.FULLSCREEN else UiConfig.Format.FIXED
         }
 
         swipeToRefresh.setOnRefreshListener {
@@ -54,6 +53,11 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
     private fun applyStories() {
 
         storiesView {
+            etToken.text.takeIf { !it.isNullOrEmpty() }?.let {
+                token = it.toString()
+            } ?: let {
+                token = null
+            }
             config {
                 format = UiConfig.Format.FIXED
                 statusBarPosition = UiConfig.VerticalAlignment.BOTTOM

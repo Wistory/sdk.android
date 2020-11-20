@@ -12,11 +12,16 @@ import ru.vvdev.wistory.internal.presentation.callback.StoryEventListener
 import ru.vvdev.wistory.internal.presentation.callback.WistoryCommunication
 import ru.vvdev.wistory.internal.presentation.ui.WistoryListFragment
 
-class WistoryView @JvmOverloads constructor(context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0) : RelativeLayout(context, attrs, defStyle) {
+class WistoryView @JvmOverloads constructor(
+    context: Context?,
+    attrs: AttributeSet? = null,
+    defStyle: Int = 0
+) : RelativeLayout(context, attrs, defStyle) {
 
     var eventListener: StoryEventListener? = null
 
     var serverUrl: String? = null
+    var token: String? = null
     var fragmentManager: FragmentManager? = null
     var registrationId: String? = null
     var config: UiConfig = UiConfig()
@@ -44,13 +49,13 @@ class WistoryView @JvmOverloads constructor(context: Context?, attrs: AttributeS
         fragmentManager?.beginTransaction()?.replace(
             R.id.fragmentContainerView,
             WistoryListFragment.newInstance(
-                Wistory.token,
+                token ?: Wistory.token,
                 Wistory.serverUrl,
                 registrationId,
                 config
             ),
-            WistoryListFragment::class.java.simpleName
-        )?.commit()
+            WistoryListFragment::class.java.simpleName + (token ?: Wistory.token)
+        )?.commitNow()
     }
 
     private fun getFragmentManager(context: Context?): FragmentManager? {
@@ -64,8 +69,10 @@ class WistoryView @JvmOverloads constructor(context: Context?, attrs: AttributeS
     override fun requestLayout() {
         super.requestLayout()
         post {
-            measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
+            measure(
+                MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
+            )
             layout(left, top, right, bottom)
         }
     }
