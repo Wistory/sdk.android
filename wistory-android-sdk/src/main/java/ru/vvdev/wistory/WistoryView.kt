@@ -38,24 +38,26 @@ class WistoryView @JvmOverloads constructor(
 
     private fun recreate() {
         eventListener?.let { WistoryCommunication.getInstance().addCallBackListener(it) }
-
         val fragmentManager: FragmentManager? =
             try {
                 FragmentManager.findFragment<Fragment>(this).childFragmentManager
             } catch (e: IllegalStateException) {
                 getFragmentManager(context)
             }
-
-        fragmentManager?.beginTransaction()?.replace(
-            R.id.fragmentContainerView,
-            WistoryListFragment.newInstance(
-                token ?: Wistory.token,
-                Wistory.serverUrl,
-                registrationId,
-                config
-            ),
-            WistoryListFragment::class.java.simpleName + (token ?: Wistory.token)
-        )?.commitNow()
+        try {
+            fragmentManager?.beginTransaction()?.replace(
+                R.id.fragmentContainerView,
+                WistoryListFragment.newInstance(
+                    token ?: Wistory.token,
+                    Wistory.serverUrl,
+                    registrationId,
+                    config
+                ),
+                WistoryListFragment::class.java.simpleName
+            )?.commit()
+        } catch (e: Exception) {
+            e
+        }
     }
 
     private fun getFragmentManager(context: Context?): FragmentManager? {
@@ -69,10 +71,8 @@ class WistoryView @JvmOverloads constructor(
     override fun requestLayout() {
         super.requestLayout()
         post {
-            measure(
-                MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
-            )
+            measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
             layout(left, top, right, bottom)
         }
     }
