@@ -220,35 +220,24 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         model.apply {
             themeConfig.let { theme ->
                 resources.apply {
-                    if (theme == UiConfig.Theme.LIGHT) {
-                        context?.let {
-                            gradient.background = if (model.enableGradient)
-                                getDrawable(R.drawable.wistory_gradient_lignt) else getDrawable(
-                                android.R.color.transparent
-                            )
-                            footer.setColor(it, R.color.wistory_white)
-                        }
-                        colorButton(ColorStateList.valueOf(getColor(R.color.wistory_black)))
+                    context?.let {
+                        val isLight = theme == UiConfig.Theme.LIGHT
+                        gradient.background = if (model.enableGradient)
+                            getDrawable(if (isLight) R.drawable.wistory_gradient_lignt else R.drawable.wistory_gradient_dark) else getDrawable(
+                            android.R.color.transparent
+                        )
+                        footer.setColor(
+                            it,
+                            if (isLight) R.color.wistory_white else R.color.wistory_black
+                        )
+
+                        colorButton(ColorStateList.valueOf(getColor(if (isLight) R.color.wistory_black else R.color.wistory_white)))
 
                         action_button.backgroundTintList =
-                            ColorStateList.valueOf(getColor(R.color.wistory_white))
-                        action_button.setTextColor(ColorStateList.valueOf(getColor(R.color.wistory_black)))
+                            ColorStateList.valueOf(getColor(if (isLight) R.color.wistory_white else R.color.wistory_black))
+                        action_button.setTextColor(ColorStateList.valueOf(getColor(if (isLight) R.color.wistory_black else R.color.wistory_white)))
                         close.imageTintList =
-                            ColorStateList.valueOf(getColor(R.color.wistory_black))
-                    } else {
-                        context?.let {
-                            gradient.background = if (model.enableGradient)
-                                getDrawable(R.drawable.wistory_gradient_dark) else getDrawable(
-                                android.R.color.transparent
-                            )
-                            footer.setColor(it, R.color.wistory_black)
-                        }
-                        colorButton(ColorStateList.valueOf(getColor(R.color.wistory_white)))
-                        action_button.backgroundTintList =
-                            ColorStateList.valueOf(getColor(R.color.wistory_black))
-                        action_button.setTextColor(ColorStateList.valueOf(getColor(R.color.wistory_white)))
-                        close.imageTintList =
-                            ColorStateList.valueOf(getColor(R.color.wistory_white))
+                            ColorStateList.valueOf(getColor(if (isLight) R.color.wistory_black else R.color.wistory_white))
                     }
                 }
             }
