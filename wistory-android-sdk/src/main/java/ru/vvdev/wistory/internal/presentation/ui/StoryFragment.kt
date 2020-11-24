@@ -1,5 +1,6 @@
 package ru.vvdev.wistory.internal.presentation.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -23,18 +24,8 @@ import com.google.android.exoplayer2.util.Util
 import kotlinx.android.synthetic.main.wistory_fragment.*
 import ru.vvdev.wistory.R
 import ru.vvdev.wistory.UiConfig
-import ru.vvdev.wistory.internal.data.models.OptionModel
-import ru.vvdev.wistory.internal.data.models.SnapCounter
-import ru.vvdev.wistory.internal.data.models.SnapModel
-import ru.vvdev.wistory.internal.data.models.Story
-import ru.vvdev.wistory.internal.data.models.StoryVotingAttr
-import ru.vvdev.wistory.internal.domain.events.ReadStoryEvent
-import ru.vvdev.wistory.internal.domain.events.VoteEvent
-import ru.vvdev.wistory.internal.domain.events.FavoriteEvent
-import ru.vvdev.wistory.internal.domain.events.NavigateEvent
-import ru.vvdev.wistory.internal.domain.events.RelationEvent
-import ru.vvdev.wistory.internal.domain.events.StoryCompleteEvent
-import ru.vvdev.wistory.internal.domain.events.StoryNextEvent
+import ru.vvdev.wistory.internal.data.models.*
+import ru.vvdev.wistory.internal.domain.events.*
 import ru.vvdev.wistory.internal.presentation.callback.ItemSelected
 import ru.vvdev.wistory.internal.presentation.callback.StoryFragmentCallback
 import ru.vvdev.wistory.internal.presentation.callback.StoryTouchListener
@@ -224,49 +215,30 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         constraintSet.applyTo(baseLayout)
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun setTheme(model: SnapModel) {
         model.apply {
             themeConfig.let { theme ->
-                if (model.enableGradient) {
-                    resources.apply {
-                        if (theme == UiConfig.Theme.LIGHT) {
-                            context?.let {
-                                gradient.background =
-                                    resources.getDrawable(R.drawable.wistory_gradient_dark)
-                                footer.setColor(it, R.color.wistory_black)
-                            }
-                            colorButton(ColorStateList.valueOf(resources.getColor(R.color.wistory_white)))
-                        } else {
-                            context?.let {
-                                gradient.background =
-                                    resources.getDrawable(R.drawable.wistory_gradient_lignt)
-                                footer.setColor(it, R.color.wistory_white)
-                            }
-                            colorButton(ColorStateList.valueOf(resources.getColor(R.color.wistory_black)))
-                        }
-                    }
-                } else {
-                    resources.apply {
-                        context?.let {
-                            gradient.background = getDrawable(android.R.color.transparent)
-                            footer.setColor(it, R.color.wistory_black)
-                        }
-                        colorButton(ColorStateList.valueOf(resources.getColor(R.color.wistory_white)))
-                    }
-                }
+                resources.apply {
+                    context?.let {
+                        val isLight = theme == UiConfig.Theme.LIGHT
+                        gradient.background = if (model.enableGradient)
+                            getDrawable(if (isLight) R.drawable.wistory_gradient_lignt else R.drawable.wistory_gradient_dark) else getDrawable(
+                            android.R.color.transparent
+                        )
+                        footer.setColor(
+                            it,
+                            if (isLight) R.color.wistory_white else R.color.wistory_black
+                        )
 
-                if (theme == UiConfig.Theme.DARK) {
-                    action_button.backgroundTintList =
-                        ColorStateList.valueOf(resources.getColor(R.color.wistory_black))
-                    action_button.setTextColor(ColorStateList.valueOf(resources.getColor(R.color.wistory_white)))
-                    close.imageTintList =
-                        ColorStateList.valueOf(resources.getColor(R.color.wistory_black))
-                } else {
-                    action_button.backgroundTintList =
-                        ColorStateList.valueOf(resources.getColor(R.color.wistory_white))
-                    action_button.setTextColor(ColorStateList.valueOf(resources.getColor(R.color.wistory_black)))
-                    close.imageTintList =
-                        ColorStateList.valueOf(resources.getColor(R.color.wistory_white))
+                        colorButton(ColorStateList.valueOf(getColor(if (isLight) R.color.wistory_black else R.color.wistory_white)))
+
+                        action_button.backgroundTintList =
+                            ColorStateList.valueOf(getColor(if (isLight) R.color.wistory_white else R.color.wistory_black))
+                        action_button.setTextColor(ColorStateList.valueOf(getColor(if (isLight) R.color.wistory_black else R.color.wistory_white)))
+                        close.imageTintList =
+                            ColorStateList.valueOf(getColor(if (isLight) R.color.wistory_black else R.color.wistory_white))
+                    }
                 }
             }
         }
@@ -329,11 +301,22 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
             val isFavorite =
                 favorite.tag == R.drawable.wistory_ic_not_favorite
             setFavoriteIcon(isFavorite)
-            storyFragmentCallback?.storyEvent(FavoriteEvent(story.apply { favorite = isFavorite }, isFavorite, position))
+            storyFragmentCallback?.storyEvent(
+                FavoriteEvent(
+                    story.apply { favorite = isFavorite },
+                    isFavorite,
+                    position
+                )
+            )
         }
     }
 
-    private fun updateRelation(story: Story, position: Int, color: ColorStateList, relation: String) {
+    private fun updateRelation(
+        story: Story,
+        position: Int,
+        color: ColorStateList,
+        relation: String
+    ) {
         setLike(relation, color)
         storyFragmentCallback?.storyEvent(RelationEvent(story.apply {
             this.relation = relation
@@ -704,7 +687,8 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                 imageProgressBar.visibility = View.VISIBLE
                 try {
                     storiesStatus.pause()
-                } catch (e: Exception) { }
+                } catch (e: Exception) {
+                }
             }
         }
 

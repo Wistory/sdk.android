@@ -25,6 +25,7 @@
             </intent-filter>
         </activity>
 
+
         <meta-data
             android:name="WISTORY_TOKEN"
             android:value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZWRmYzI0NTRlMmRiYjZlZGVjNzU0ZWUiLCJpYXQiOjE2MDI1MDc5MDF9.yF8RpLlpIE9DysGbb7EADN6mqRR3UepS0yj_yNTTQSo" />
