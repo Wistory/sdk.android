@@ -10,6 +10,8 @@ import ru.vvdev.wistory.internal.presentation.callback.StoryEventListener
 
 class MainActivity : AppCompatActivity(), StoryEventListener {
 
+    private var baseServer: Int = R.string.wistory_dev_url
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -39,6 +41,11 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
                 if (isChecked) UiConfig.Format.FULLSCREEN else UiConfig.Format.FIXED
         }
 
+        swServer.setOnCheckedChangeListener { _, isChecked ->
+            baseServer = if (isChecked) R.string.wistory_dev_url else R.string.wistory_base_url
+            applyStories()
+        }
+
         swipeToRefresh.setOnRefreshListener {
             applyStories()
         }
@@ -58,6 +65,7 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
             } ?: let {
                 token = null
             }
+            serverUrl = getString(baseServer)
             config {
                 format = UiConfig.Format.FIXED
                 statusBarPosition = UiConfig.VerticalAlignment.BOTTOM

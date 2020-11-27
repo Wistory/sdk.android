@@ -1,4 +1,6 @@
 <resources>
     <string name="wistory_base_url" translatable="false">https://api.wistory.io/</string>
+    <string name="wistory_dev_url" translatable="false">https://wistorybacktest.vvdev.ru/</string>
+
     <string name="wistory_favorite">Избранное</string>
 </resources>

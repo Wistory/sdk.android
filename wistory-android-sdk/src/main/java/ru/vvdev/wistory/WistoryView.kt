@@ -49,7 +49,7 @@ class WistoryView @JvmOverloads constructor(
                 R.id.fragmentContainerView,
                 WistoryListFragment.newInstance(
                     token ?: Wistory.token,
-                    Wistory.serverUrl,
+                    serverUrl ?: Wistory.serverUrl,
                     registrationId,
                     config
                 ),
@@ -71,8 +71,10 @@ class WistoryView @JvmOverloads constructor(
     override fun requestLayout() {
         super.requestLayout()
         post {
-            measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
+            measure(
+                MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
+            )
             layout(left, top, right, bottom)
         }
     }
