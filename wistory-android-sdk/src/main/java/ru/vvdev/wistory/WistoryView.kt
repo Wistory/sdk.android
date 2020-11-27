@@ -37,7 +37,10 @@ class WistoryView @JvmOverloads constructor(
     }
 
     private fun recreate() {
-        eventListener?.let { WistoryCommunication.getInstance().addCallBackListener(it) }
+        eventListener?.let {
+            WistoryCommunication.getInstance().removeCallbackListener(it)
+            WistoryCommunication.getInstance().addCallBackListener(it)
+        }
         val fragmentManager: FragmentManager? =
             try {
                 FragmentManager.findFragment<Fragment>(this).childFragmentManager

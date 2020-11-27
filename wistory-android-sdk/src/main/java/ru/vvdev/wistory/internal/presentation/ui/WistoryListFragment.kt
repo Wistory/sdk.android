@@ -168,6 +168,7 @@ internal class WistoryListFragment : Fragment(), StoryEventListener,
     }
 
     private fun initListener() {
+        WistoryCommunication.getInstance().removeCallbackListener(this)
         WistoryCommunication.getInstance().addCallBackListener(this)
     }
 
