@@ -233,16 +233,14 @@
             android:layout_height="28dp"
             android:layout_marginRight="16dp"
             android:padding="2dp"
-            android:tint="@color/wistory_gray"
-            android:src="@drawable/wistory_ic_like"/>
+            android:src="@drawable/wistory_ic_not_like"/>
 
         <ImageView
             android:id="@+id/dislike"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:padding="2dp"
-            android:tint="@color/wistory_gray"
-            android:src="@drawable/wistory_ic_dislike"/>
+            android:src="@drawable/wistory_ic_not_dislike"/>
         <FrameLayout
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -253,7 +251,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:padding="2dp"
-                android:src="@drawable/wistory_ic_dislike"/>
+                android:src="@drawable/wistory_ic_not_favorite"/>
         </FrameLayout>
 
     </LinearLayout>

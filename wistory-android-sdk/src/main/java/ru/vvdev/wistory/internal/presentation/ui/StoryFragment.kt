@@ -245,10 +245,8 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     }
 
     private fun colorButton(color: ColorStateList) {
-        if (like.imageTintList != ColorStateList.valueOf(resources.getColor(R.color.wistory_gray)))
-            like.imageTintList = color
-        if (dislike.imageTintList != ColorStateList.valueOf(resources.getColor(R.color.wistory_gray)))
-            dislike.imageTintList = color
+        like.imageTintList = color
+        dislike.imageTintList = color
         favorite.imageTintList = color
 
         setupBottomButtons(story, color)
@@ -323,6 +321,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         }, relation, position))
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun setFavoriteIcon(fav: Boolean) {
         if (fav) {
             favorite.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_favorite))
@@ -333,17 +332,16 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         }
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun setLike(liked: String, color: ColorStateList) {
 
         if (liked == "like") {
-            like.imageTintList = color
-            dislike.imageTintList =
-                ColorStateList.valueOf(resources.getColor(R.color.wistory_gray))
+            dislike.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_not_dislike))
+            like.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_like))
             like.tag = R.drawable.wistory_ic_like
         } else if (liked == "dislike") {
-            like.imageTintList =
-                ColorStateList.valueOf(resources.getColor(R.color.wistory_gray))
-            dislike.imageTintList = color
+            dislike.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_dislike))
+            like.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_not_like))
             dislike.tag = R.drawable.wistory_ic_dislike
         }
     }
