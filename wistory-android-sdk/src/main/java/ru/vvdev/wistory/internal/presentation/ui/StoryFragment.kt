@@ -248,7 +248,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         like.imageTintList = color
         dislike.imageTintList = color
         favorite.imageTintList = color
-
+        share.imageTintList = color
         setupBottomButtons(story, color)
     }
 
@@ -286,14 +286,14 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
         val position: Int = arguments?.getSerializable(ARG_STORY_POSITION) as Int
 
-        setLike(story.relation, color)
+        setLike(story.relation)
         setFavoriteIcon(story.favorite)
 
         like.setOnClickListener {
-            updateRelation(story, position, color, STORY_RELATION_LIKE)
+            updateRelation(story, position, STORY_RELATION_LIKE)
         }
         dislike.setOnClickListener {
-            updateRelation(story, position, color, STORY_RELATION_DISLIKE)
+            updateRelation(story, position, STORY_RELATION_DISLIKE)
         }
         favorite.setOnClickListener {
             val isFavorite =
@@ -312,10 +312,9 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     private fun updateRelation(
         story: Story,
         position: Int,
-        color: ColorStateList,
         relation: String
     ) {
-        setLike(relation, color)
+        setLike(relation)
         storyFragmentCallback?.storyEvent(RelationEvent(story.apply {
             this.relation = relation
         }, relation, position))
@@ -333,7 +332,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    private fun setLike(liked: String, color: ColorStateList) {
+    private fun setLike(liked: String) {
 
         if (liked == "like") {
             dislike.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_not_dislike))

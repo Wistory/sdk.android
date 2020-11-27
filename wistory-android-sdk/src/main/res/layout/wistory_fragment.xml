@@ -239,19 +239,29 @@
             android:id="@+id/dislike"
             android:layout_width="28dp"
             android:layout_height="28dp"
+            android:layout_marginRight="16dp"
+
             android:padding="2dp"
             android:src="@drawable/wistory_ic_not_dislike"/>
+
+        <ImageView
+            android:id="@+id/favorite"
+            android:layout_gravity="right"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:padding="2dp"
+            android:src="@drawable/wistory_ic_not_favorite"/>
         <FrameLayout
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content">
             <ImageView
-                android:id="@+id/favorite"
+                android:id="@+id/share"
                 android:layout_gravity="right"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:padding="2dp"
-                android:src="@drawable/wistory_ic_not_favorite"/>
+                android:src="@drawable/wistory_ic_share"/>
         </FrameLayout>
 
     </LinearLayout>
