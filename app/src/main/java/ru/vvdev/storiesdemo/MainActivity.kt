@@ -6,10 +6,10 @@ import android.text.TextWatcher
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT
 import com.google.android.material.snackbar.Snackbar
+import java.lang.Exception
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.vvdev.wistory.UiConfig
 import ru.vvdev.wistory.internal.presentation.callback.StoryEventListener
-import java.lang.Exception
 
 class MainActivity : AppCompatActivity(), StoryEventListener {
 
@@ -81,6 +81,6 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
 
     override fun onError(e: Exception) {
         super.onError(e)
-        Snackbar.make(swipeToRefresh,e.localizedMessage, LENGTH_SHORT).show()
+        Snackbar.make(swipeToRefresh, e.localizedMessage, LENGTH_SHORT).show()
     }
 }
