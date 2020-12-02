@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.DrawableImageViewTarget
 import com.bumptech.glide.request.target.Target
@@ -54,14 +55,14 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
     private val options = RequestOptions()
         .skipMemoryCache(false)
-        .transform(CenterCrop())
+        .transform(CenterCrop(), RoundedCorners(16))
         .diskCacheStrategy(DiskCacheStrategy.ALL)
 
     companion object {
         private const val ARG_STORY = "STORY"
         private const val ARG_STORY_POSITION = "POS"
         private const val ARG_STORY_SETTINGS = "SETTINGS"
-        private const val STORY_FIXED_RATIO = "9:14.7"
+        private const val STORY_FIXED_RATIO = "9:14.6"
         private const val STORY_RELATION_LIKE = "like"
         private const val STORY_RELATION_DISLIKE = "dislike"
         private const val STATUSBAR_VERTICAL_BOTTOM_BIAS = 0.97f
@@ -272,7 +273,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
             videoPlayer?.releasePlayer()
 
-            image.let {
+            getResource().let {
                 if (it.contains(".mp4")) {
                     setVideoContent(it)
                 } else {
@@ -401,7 +402,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         storyFragmentCallback?.storyEvent(StoryNextEvent(story))
 
         for (s in story.content) {
-            statusResources.add(s.image)
+            statusResources.add(s.getResource())
         }
 
         var arr = ArrayList<Long>()
@@ -743,7 +744,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         var storyHaveVideo = false
         val story = requireArguments().getSerializable(ARG_STORY) as Story
         story.content.map {
-            if (it.image.contains(".mp4"))
+            if (it.video.contains(".mp4"))
                 storyHaveVideo = true
         }
         if (storyHaveVideo) {
