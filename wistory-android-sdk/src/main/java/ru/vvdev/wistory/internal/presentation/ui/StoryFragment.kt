@@ -2,6 +2,7 @@ package ru.vvdev.wistory.internal.presentation.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.Drawable
@@ -255,7 +256,6 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
     private fun setValues(story: Story, uiConfig: UiConfig) {
         videoPrepared = false
-
         story.content[getCurrentSnap()].apply {
 
             uiConfig.statusBarPosition?.let {
@@ -270,6 +270,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                 setTextStory(this)
 
             setFormat(uiConfig.format)
+            setSharing(story._id)
 
             videoPlayer?.releasePlayer()
 
@@ -343,6 +344,15 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
             dislike.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_dislike))
             like.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_not_like))
             dislike.tag = R.drawable.wistory_ic_dislike
+        }
+    }
+    
+    private fun setSharing(idStory: String) {
+        share.setOnClickListener {
+            val shareIntent = Intent(Intent.ACTION_SEND)
+            shareIntent.type = "text/plain"
+            shareIntent.putExtra(Intent.EXTRA_TEXT, "https://wistory.io/story/$idStory")
+            startActivity(Intent.createChooser(shareIntent, ""))
         }
     }
 
