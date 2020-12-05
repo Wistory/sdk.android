@@ -71,7 +71,6 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
             serverUrl = getString(baseServer)
             config {
                 format = UiConfig.Format.FIXED
-                statusBarPosition = UiConfig.VerticalAlignment.BOTTOM
             }
             eventListener = this@MainActivity
         }
