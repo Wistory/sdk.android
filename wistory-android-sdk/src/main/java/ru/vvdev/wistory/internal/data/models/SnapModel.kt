@@ -29,5 +29,5 @@ internal class SnapModel(
                 "light"
         }
 
-    fun getResource() = takeIf { !video.isNullOrEmpty() }?.let { video }?:let { image }
+    fun getContentResource() = takeIf { !video.isNullOrEmpty() }?.let { video }?:let { image }
 }

@@ -273,7 +273,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
             videoPlayer?.releasePlayer()
 
-            getResource().let {
+            getContentResource().let {
                 if (it.contains(".mp4")) {
                     setVideoContent(it)
                 } else {
@@ -402,7 +402,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         storyFragmentCallback?.storyEvent(StoryNextEvent(story))
 
         for (s in story.content) {
-            statusResources.add(s.getResource())
+            statusResources.add(s.getContentResource())
         }
 
         var arr = ArrayList<Long>()
