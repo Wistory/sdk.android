@@ -346,12 +346,12 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
             dislike.tag = R.drawable.wistory_ic_dislike
         }
     }
-    
+
     private fun setSharing(idStory: String) {
         share.setOnClickListener {
             val shareIntent = Intent(Intent.ACTION_SEND)
             shareIntent.type = "text/plain"
-            shareIntent.putExtra(Intent.EXTRA_TEXT, "https://wistory.io/story/$idStory")
+            shareIntent.putExtra(Intent.EXTRA_TEXT, context?.resources?.getString(R.string.sharing_url,idStory))
             startActivity(Intent.createChooser(shareIntent, ""))
         }
     }
