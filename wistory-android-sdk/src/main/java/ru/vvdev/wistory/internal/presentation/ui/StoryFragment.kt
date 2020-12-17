@@ -65,6 +65,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         private const val STORY_FIXED_RATIO = "9:14.6"
         private const val STORY_RELATION_LIKE = "like"
         private const val STORY_RELATION_DISLIKE = "dislike"
+        private const val STORY_HEADER_LENGTH = 43
         private const val STATUSBAR_VERTICAL_BOTTOM_BIAS = 0.97f
         private const val STATUSBAR_VERTICAL_TOP_BIAS = 0.04f
         private const val statusMargin: Int = 16
@@ -211,7 +212,8 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         }
 
         storiesStatus.setPadding(pxToDp(statusMargin), 0, pxToDp(statusMargin), 0)
-        llClose.setPadding(pxToDp(statusMargin), 0, 0, 0)
+        wrapperHeader.setPadding(pxToDp(statusMargin), 0, 0, 0)
+        llClose.setPadding(0, 0, pxToDp(statusMargin), 0)
 
         constraintSet.applyTo(baseLayout)
     }
@@ -226,6 +228,11 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                         gradient.background = if (model.enableGradient)
                             getDrawable(if (isLight) R.drawable.wistory_gradient_lignt else R.drawable.wistory_gradient_dark) else getDrawable(
                             android.R.color.transparent
+                        )
+                        tvStoryHeader.setTextColor(
+                            resources.getColor(
+                                if (isLight) R.color.wistory_white else R.color.wistory_black
+                            )
                         )
                         footer.setColor(
                             it,
@@ -253,8 +260,17 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         setupBottomButtons(story, color)
     }
 
+    private fun setStoryHeaderText(title: String) {
+        tvStoryHeader.text = if (title.length > STORY_HEADER_LENGTH)
+            "${title.trim('\n', ' ').substring(0, STORY_HEADER_LENGTH)}..."
+        else
+            title
+    }
+
     private fun setValues(story: Story, uiConfig: UiConfig) {
         videoPrepared = false
+
+        createStoryHeader(story)
 
         story.content[getCurrentSnap()].apply {
 
@@ -280,6 +296,17 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                     setImageContent(it)
                 }
             }
+        }
+    }
+
+    private fun createStoryHeader(story: Story) {
+        if (story.thumbnail.isNotEmpty() && story.title.isNotEmpty()) {
+            wrapperHeader.visibility = View.VISIBLE
+            Glide.with(requireContext())
+                .load(story.thumbnail)
+                .apply(RequestOptions().transforms(CenterCrop(), RoundedCorners(60)))
+                .into(headerAvatar)
+            setStoryHeaderText(story.title)
         }
     }
 
