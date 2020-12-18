@@ -267,7 +267,6 @@
                 android:layout_gravity="right"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:layout_gravity="right"
                 android:padding="2dp"
                 android:src="@drawable/wistory_ic_share"/>
 
