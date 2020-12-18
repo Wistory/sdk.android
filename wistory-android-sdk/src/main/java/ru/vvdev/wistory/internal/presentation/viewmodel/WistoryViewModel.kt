@@ -34,7 +34,7 @@ internal class WistoryViewModel(private val storiesRepository: StoriesRepository
                     is RegisterResponse -> storyItems.value.run { getItems() }
                 }
             } catch (e: Exception) {
-                errorLiveData.value = e
+                errorLiveData.setValue(e)
                 storyItems.value.run { getItems() }
             }
         }
