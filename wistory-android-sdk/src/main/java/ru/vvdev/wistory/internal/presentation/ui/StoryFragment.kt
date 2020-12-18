@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -313,7 +314,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     private fun setupBottomButtons(story: Story, color: ColorStateList) {
 
         val position: Int = arguments?.getSerializable(ARG_STORY_POSITION) as Int
-
+        
         setLike(story.relation)
         setFavoriteIcon(story.favorite)
 
@@ -343,9 +344,18 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         relation: String
     ) {
         setLike(relation)
+
         storyFragmentCallback?.storyEvent(RelationEvent(story.apply {
-            this.relation = relation
-        }, relation, position))
+            this.relation = getRelationValue().toString()
+        }, getRelationValue().toString(), position))
+    }
+
+    private fun getRelationValue(): String? {
+        return when (like.tag) {
+            R.drawable.wistory_ic_like -> STORY_RELATION_LIKE
+            R.drawable.wistory_ic_dislike -> STORY_RELATION_DISLIKE
+            else -> null
+        }
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -360,16 +370,34 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    private fun setLike(liked: String) {
+    private fun setLike(liked: String?) {
 
-        if (liked == "like") {
-            dislike.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_not_dislike))
-            like.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_like))
-            like.tag = R.drawable.wistory_ic_like
-        } else if (liked == "dislike") {
-            dislike.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_dislike))
-            like.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_not_like))
-            dislike.tag = R.drawable.wistory_ic_dislike
+        if (liked == STORY_RELATION_LIKE) {
+            like.setImageDrawable(
+                if (like.tag == R.drawable.wistory_ic_like) {
+                    like.tag = R.drawable.wistory_ic_not_like
+                    dislike.tag = R.drawable.wistory_ic_not_dislike
+                    resources.getDrawable(R.drawable.wistory_ic_not_like)
+                } else {
+                    like.tag = R.drawable.wistory_ic_like
+                    dislike.tag = R.drawable.wistory_ic_not_dislike
+                    dislike.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_not_dislike))
+                    resources.getDrawable(R.drawable.wistory_ic_like)
+                }
+            )
+        } else if (liked == STORY_RELATION_DISLIKE) {
+            dislike.setImageDrawable(
+                if (dislike.tag == R.drawable.wistory_ic_dislike) {
+                    dislike.tag = R.drawable.wistory_ic_not_dislike
+                    like.tag = R.drawable.wistory_ic_not_like
+                    resources.getDrawable(R.drawable.wistory_ic_not_dislike)
+                } else {
+                    dislike.tag = R.drawable.wistory_ic_dislike
+                    like.tag = R.drawable.wistory_ic_not_like
+                    like.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_not_like))
+                    resources.getDrawable(R.drawable.wistory_ic_dislike)
+                }
+            )
         }
     }
 
@@ -771,7 +799,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         var storyHaveVideo = false
         val story = requireArguments().getSerializable(ARG_STORY) as Story
         story.content.map {
-            if (it.video.contains(".mp4"))
+            if (it.video?.contains(".mp4") == true)
                 storyHaveVideo = true
         }
         if (storyHaveVideo) {

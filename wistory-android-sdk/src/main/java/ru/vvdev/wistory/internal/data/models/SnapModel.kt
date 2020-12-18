@@ -7,7 +7,7 @@ internal class SnapModel(
     val textBlock: TextModel?,
     var statusbar: ProgressbarModel?,
     val image: String,
-    val video: String,
+    val video: String?,
     var enableGradient: Boolean,
     val button: ButtonModel?,
     val duration: String,
