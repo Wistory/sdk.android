@@ -37,7 +37,10 @@ class WistoryView @JvmOverloads constructor(
     }
 
     private fun recreate() {
-        eventListener?.let { WistoryCommunication.getInstance().addCallBackListener(it) }
+        eventListener?.let {
+            WistoryCommunication.getInstance().removeCallbackListener(it)
+            WistoryCommunication.getInstance().addCallBackListener(it)
+        }
         val fragmentManager: FragmentManager? =
             try {
                 FragmentManager.findFragment<Fragment>(this).childFragmentManager
@@ -49,7 +52,7 @@ class WistoryView @JvmOverloads constructor(
                 R.id.fragmentContainerView,
                 WistoryListFragment.newInstance(
                     token ?: Wistory.token,
-                    Wistory.serverUrl,
+                    serverUrl ?: Wistory.serverUrl,
                     registrationId,
                     config
                 ),
@@ -71,8 +74,10 @@ class WistoryView @JvmOverloads constructor(
     override fun requestLayout() {
         super.requestLayout()
         post {
-            measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
+            measure(
+                MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
+            )
             layout(left, top, right, bottom)
         }
     }

@@ -4,11 +4,16 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT
+import com.google.android.material.snackbar.Snackbar
+import java.lang.Exception
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.vvdev.wistory.UiConfig
 import ru.vvdev.wistory.internal.presentation.callback.StoryEventListener
 
 class MainActivity : AppCompatActivity(), StoryEventListener {
+
+    private var baseServer: Int = R.string.wistory_dev_url
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +44,11 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
                 if (isChecked) UiConfig.Format.FULLSCREEN else UiConfig.Format.FIXED
         }
 
+        swServer.setOnCheckedChangeListener { _, isChecked ->
+            baseServer = if (isChecked) R.string.wistory_dev_url else R.string.wistory_base_url
+            applyStories()
+        }
+
         swipeToRefresh.setOnRefreshListener {
             applyStories()
         }
@@ -58,13 +68,18 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
             } ?: let {
                 token = null
             }
+            serverUrl = getString(baseServer)
             config {
                 format = UiConfig.Format.FIXED
-                statusBarPosition = UiConfig.VerticalAlignment.BOTTOM
             }
             eventListener = this@MainActivity
         }
 
         swipeToRefresh.isRefreshing = false
+    }
+
+    override fun onError(e: Exception) {
+        super.onError(e)
+        Snackbar.make(swipeToRefresh, e.localizedMessage, LENGTH_SHORT).show()
     }
 }

@@ -7,6 +7,7 @@ internal class SnapModel(
     val textBlock: TextModel?,
     var statusbar: ProgressbarModel?,
     val image: String,
+    val video: String,
     var enableGradient: Boolean,
     val button: ButtonModel?,
     val duration: String,
@@ -27,4 +28,6 @@ internal class SnapModel(
             else
                 "light"
         }
+
+    fun getContentResource() = takeIf { !video.isNullOrEmpty() }?.let { video }?:let { image }
 }

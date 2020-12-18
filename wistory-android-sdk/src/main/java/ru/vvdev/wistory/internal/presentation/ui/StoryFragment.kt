@@ -2,6 +2,7 @@ package ru.vvdev.wistory.internal.presentation.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.Drawable
@@ -17,6 +18,7 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.DrawableImageViewTarget
 import com.bumptech.glide.request.target.Target
@@ -54,14 +56,14 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
     private val options = RequestOptions()
         .skipMemoryCache(false)
-        .transform(CenterCrop())
+        .transform(CenterCrop(), RoundedCorners(16))
         .diskCacheStrategy(DiskCacheStrategy.ALL)
 
     companion object {
         private const val ARG_STORY = "STORY"
         private const val ARG_STORY_POSITION = "POS"
         private const val ARG_STORY_SETTINGS = "SETTINGS"
-        private const val STORY_FIXED_RATIO = "9:14.7"
+        private const val STORY_FIXED_RATIO = "9:14.6"
         private const val STORY_RELATION_LIKE = "like"
         private const val STORY_RELATION_DISLIKE = "dislike"
         private const val STATUSBAR_VERTICAL_BOTTOM_BIAS = 0.97f
@@ -246,18 +248,15 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     }
 
     private fun colorButton(color: ColorStateList) {
-        if (like.imageTintList != ColorStateList.valueOf(resources.getColor(R.color.wistory_gray)))
-            like.imageTintList = color
-        if (dislike.imageTintList != ColorStateList.valueOf(resources.getColor(R.color.wistory_gray)))
-            dislike.imageTintList = color
+        like.imageTintList = color
+        dislike.imageTintList = color
         favorite.imageTintList = color
-
+        share.imageTintList = color
         setupBottomButtons(story, color)
     }
 
     private fun setValues(story: Story, uiConfig: UiConfig) {
         videoPrepared = false
-
         story.content[getCurrentSnap()].apply {
 
             uiConfig.statusBarPosition?.let {
@@ -272,10 +271,11 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                 setTextStory(this)
 
             setFormat(uiConfig.format)
+            setSharing(story._id)
 
             videoPlayer?.releasePlayer()
 
-            image.let {
+            getContentResource().let {
                 if (it.contains(".mp4")) {
                     setVideoContent(it)
                 } else {
@@ -289,14 +289,14 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
         val position: Int = arguments?.getSerializable(ARG_STORY_POSITION) as Int
 
-        setLike(story.relation, color)
+        setLike(story.relation)
         setFavoriteIcon(story.favorite)
 
         like.setOnClickListener {
-            updateRelation(story, position, color, STORY_RELATION_LIKE)
+            updateRelation(story, position, STORY_RELATION_LIKE)
         }
         dislike.setOnClickListener {
-            updateRelation(story, position, color, STORY_RELATION_DISLIKE)
+            updateRelation(story, position, STORY_RELATION_DISLIKE)
         }
         favorite.setOnClickListener {
             val isFavorite =
@@ -315,15 +315,15 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     private fun updateRelation(
         story: Story,
         position: Int,
-        color: ColorStateList,
         relation: String
     ) {
-        setLike(relation, color)
+        setLike(relation)
         storyFragmentCallback?.storyEvent(RelationEvent(story.apply {
             this.relation = relation
         }, relation, position))
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun setFavoriteIcon(fav: Boolean) {
         if (fav) {
             favorite.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_favorite))
@@ -334,18 +334,26 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         }
     }
 
-    private fun setLike(liked: String, color: ColorStateList) {
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun setLike(liked: String) {
 
         if (liked == "like") {
-            like.imageTintList = color
-            dislike.imageTintList =
-                ColorStateList.valueOf(resources.getColor(R.color.wistory_gray))
+            dislike.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_not_dislike))
+            like.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_like))
             like.tag = R.drawable.wistory_ic_like
         } else if (liked == "dislike") {
-            like.imageTintList =
-                ColorStateList.valueOf(resources.getColor(R.color.wistory_gray))
-            dislike.imageTintList = color
+            dislike.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_dislike))
+            like.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_not_like))
             dislike.tag = R.drawable.wistory_ic_dislike
+        }
+    }
+
+    private fun setSharing(idStory: String) {
+        share.setOnClickListener {
+            val shareIntent = Intent(Intent.ACTION_SEND)
+            shareIntent.type = "text/plain"
+            shareIntent.putExtra(Intent.EXTRA_TEXT, context?.resources?.getString(R.string.sharing_url,idStory))
+            startActivity(Intent.createChooser(shareIntent, ""))
         }
     }
 
@@ -405,7 +413,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         storyFragmentCallback?.storyEvent(StoryNextEvent(story))
 
         for (s in story.content) {
-            statusResources.add(s.image)
+            statusResources.add(s.getContentResource())
         }
 
         var arr = ArrayList<Long>()
@@ -747,7 +755,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         var storyHaveVideo = false
         val story = requireArguments().getSerializable(ARG_STORY) as Story
         story.content.map {
-            if (it.image.contains(".mp4"))
+            if (it.video.contains(".mp4"))
                 storyHaveVideo = true
         }
         if (storyHaveVideo) {

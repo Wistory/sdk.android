@@ -99,6 +99,22 @@
                             android:layout_marginLeft="16dp"
                             android:layout_marginRight="16dp"
                             android:text="На полный экран" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="16dp"
+                            android:layout_marginTop="16dp"
+                            android:text="Стенд" />
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/swServer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="16dp"
+                            android:layout_marginRight="16dp"
+                            android:checked="true"
+                            android:text="Дебаг" />
                     </LinearLayout>
                 </RelativeLayout>
             </LinearLayout>
