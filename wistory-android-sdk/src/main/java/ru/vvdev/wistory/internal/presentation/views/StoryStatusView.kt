@@ -190,10 +190,6 @@ internal class StoryStatusView : LinearLayout {
                 current = index
                 if (isReverse) {
                     isReverse = false
-                } else {
-/*
-                    animators[index].pause()
-*/
                 }
                 animators[index].pause()
             }
@@ -223,7 +219,7 @@ internal class StoryStatusView : LinearLayout {
 
     companion object {
 
-        private const val MAX_PROGRESS = 100
+        private const val MAX_PROGRESS = 10000
         private const val SPACE_BETWEEN_PROGRESS_BARS = 20
     }
 }
