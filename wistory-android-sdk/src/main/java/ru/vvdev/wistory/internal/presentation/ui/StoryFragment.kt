@@ -66,7 +66,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         private const val STORY_RELATION_DISLIKE = "dislike"
         private const val STATUSBAR_VERTICAL_BOTTOM_BIAS = 0.97f
         private const val STATUSBAR_VERTICAL_TOP_BIAS = 0.04f
-        private const val statusMargin: Int = 16
+        private const val statusMargin: Int = 20
         private const val buttonMargin: Int = 24
         private const val buttonBetaMargin: Int = 96
 
@@ -217,6 +217,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun setTheme(model: SnapModel) {
+
         model.apply {
             themeConfig.let { theme ->
                 resources.apply {
