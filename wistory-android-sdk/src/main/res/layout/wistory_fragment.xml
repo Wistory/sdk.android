@@ -212,7 +212,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="2dp"
-            android:src="@drawable/ic_white_sound_on"
+            android:src="@drawable/ic_sound_on_white"
             app:layout_constraintBottom_toBottomOf="@id/close"
             app:layout_constraintEnd_toStartOf="@id/close"
             app:layout_constraintTop_toTopOf="@id/close" />
