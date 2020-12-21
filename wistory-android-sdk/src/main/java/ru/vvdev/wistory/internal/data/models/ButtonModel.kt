@@ -1,7 +1,7 @@
 package ru.vvdev.wistory.internal.data.models
 
-import java.io.Serializable
 import ru.vvdev.wistory.UiConfig
+import java.io.Serializable
 
 internal data class ButtonModel(
     private var alignment: String,
@@ -26,6 +26,20 @@ internal data class ButtonModel(
                 UiConfig.HorizontalAlignment.LEFT -> "left"
                 UiConfig.HorizontalAlignment.RIGHT -> "right"
                 else -> "center"
+            }
+        }
+
+    var format: UiConfig.Format
+        get() {
+            return if (alignment == "fullScreen")
+                UiConfig.Format.FULLSCREEN
+            else
+                UiConfig.Format.FIXED
+        }
+        set(value) {
+            alignment = when (value) {
+                UiConfig.Format.FULLSCREEN -> "fullScreen"
+                else -> "fixed"
             }
         }
 }

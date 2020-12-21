@@ -8,7 +8,6 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -314,7 +313,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     private fun setupBottomButtons(story: Story, color: ColorStateList) {
 
         val position: Int = arguments?.getSerializable(ARG_STORY_POSITION) as Int
-        
+
         setLike(story.relation)
         setFavoriteIcon(story.favorite)
 
@@ -573,16 +572,24 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
             action_button.setTextColor(
                 ColorStateList.valueOf(button.textColor.parseHexColor())
             )
+
+            if (button.format == UiConfig.Format.FULLSCREEN)
+                baseLayout.setOnClickListener {
+                    setButtonNavigate(button)
+                }
+
             action_button.setOnClickListener {
-                storyFragmentCallback?.storyEvent(
-                    NavigateEvent(
-                        button.action,
-                        button.value ?: button.valueUrl,
-                        title.toString()
-                    )
-                )
+                setButtonNavigate(button)
             }
         } ?: removeButton()
+    }
+
+    private fun setButtonNavigate(button: ButtonModel) {
+        NavigateEvent(
+            button.action,
+            button.value ?: button.valueUrl,
+            title.toString()
+        )
     }
 
     private fun removeButton() {
