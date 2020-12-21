@@ -204,7 +204,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="9dp"
             android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@+id/headerAvatar"
             app:layout_constraintStart_toEndOf="@id/headerAvatar"
             app:layout_constraintTop_toTopOf="@id/headerAvatar" />
 
