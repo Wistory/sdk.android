@@ -8,7 +8,6 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -213,8 +212,6 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         }
 
         storiesStatus.setPadding(pxToDp(statusMargin), 0, pxToDp(statusMargin), 0)
-        wrapperHeader.setPadding(pxToDp(statusMargin), 0, 0, 0)
-        llClose.setPadding(0, 0, pxToDp(statusMargin), 0)
 
         constraintSet.applyTo(baseLayout)
     }
@@ -302,7 +299,6 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
     private fun createStoryHeader(story: Story) {
         if (story.thumbnail.isNotEmpty() && story.title.isNotEmpty()) {
-            wrapperHeader.visibility = View.VISIBLE
             Glide.with(requireContext())
                 .load(story.thumbnail)
                 .apply(RequestOptions().transforms(CenterCrop(), RoundedCorners(60)))
@@ -314,7 +310,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     private fun setupBottomButtons(story: Story, color: ColorStateList) {
 
         val position: Int = arguments?.getSerializable(ARG_STORY_POSITION) as Int
-        
+
         setLike(story.relation)
         setFavoriteIcon(story.favorite)
 
@@ -545,12 +541,22 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                 when (alignmentConfig) {
                     UiConfig.VerticalAlignment.TOP -> {
                         constraintSet.setVerticalBias(id, STATUSBAR_VERTICAL_TOP_BIAS)
-                        constraintSet.connect(llClose.id, ConstraintSet.TOP, id, ConstraintSet.TOP)
+                        constraintSet.connect(close.id, ConstraintSet.TOP, id, ConstraintSet.TOP)
+                        constraintSet.setMargin(
+                            close.id,
+                            ConstraintSet.END,
+                            pxToDp(statusMargin)
+                        )
+                        constraintSet.setMargin(
+                            headerAvatar.id,
+                            ConstraintSet.START,
+                            pxToDp(statusMargin)
+                        )
                     }
                     UiConfig.VerticalAlignment.BOTTOM -> {
                         constraintSet.setVerticalBias(id, STATUSBAR_VERTICAL_BOTTOM_BIAS)
                         constraintSet.connect(
-                            llClose.id,
+                            close.id,
                             ConstraintSet.TOP,
                             baseLayout.id,
                             ConstraintSet.TOP
@@ -620,7 +626,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                     constraintSet.connect(
                         textBlock.id,
                         ConstraintSet.TOP,
-                        llClose.id,
+                        close.id,
                         ConstraintSet.BOTTOM
                     )
                 }
@@ -643,7 +649,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                     constraintSet.connect(
                         textBlock.id,
                         ConstraintSet.TOP,
-                        llClose.id,
+                        close.id,
                         ConstraintSet.BOTTOM
                     )
                 }
