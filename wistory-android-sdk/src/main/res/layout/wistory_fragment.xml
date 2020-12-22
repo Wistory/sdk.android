@@ -193,7 +193,7 @@
             android:id="@+id/headerAvatar"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_marginStart="4dp"
+            android:layout_marginTop="10dp"
             app:layout_constraintBottom_toBottomOf="@+id/close"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/close" />
@@ -221,7 +221,6 @@
             android:id="@+id/close"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginTop="10dp"
             android:contentDescription="@null"
             android:paddingStart="20dp"
             android:paddingTop="10dp"

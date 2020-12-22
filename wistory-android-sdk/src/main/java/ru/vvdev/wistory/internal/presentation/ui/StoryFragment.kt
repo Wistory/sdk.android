@@ -69,6 +69,9 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         private const val STATUSBAR_VERTICAL_BOTTOM_BIAS = 0.97f
         private const val STATUSBAR_VERTICAL_TOP_BIAS = 0.04f
         private const val statusMargin: Int = 16
+        private const val avatarMargin: Int = 20
+        private const val closeParenetTopMargin: Int = 26
+        private const val closeTopMargin: Int = 10
         private const val buttonMargin: Int = 24
         private const val buttonBetaMargin: Int = 96
 
@@ -548,10 +551,16 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                             pxToDp(statusMargin)
                         )
                         constraintSet.setMargin(
+                            close.id,
+                            ConstraintSet.TOP,
+                            pxToDp(closeTopMargin)
+                        )
+                        constraintSet.setMargin(
                             headerAvatar.id,
                             ConstraintSet.START,
-                            pxToDp(statusMargin)
+                            pxToDp(avatarMargin)
                         )
+
                     }
                     UiConfig.VerticalAlignment.BOTTOM -> {
                         constraintSet.setVerticalBias(id, STATUSBAR_VERTICAL_BOTTOM_BIAS)
@@ -560,6 +569,21 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                             ConstraintSet.TOP,
                             baseLayout.id,
                             ConstraintSet.TOP
+                        )
+                        constraintSet.setMargin(
+                            close.id,
+                            ConstraintSet.TOP,
+                            pxToDp(closeParenetTopMargin)
+                        )
+                        constraintSet.setMargin(
+                            headerAvatar.id,
+                            ConstraintSet.START,
+                            pxToDp(avatarMargin)
+                        )
+                        constraintSet.setMargin(
+                            close.id,
+                            ConstraintSet.END,
+                            pxToDp(statusMargin)
                         )
                     }
                 }
