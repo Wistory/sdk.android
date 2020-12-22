@@ -585,10 +585,12 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     }
 
     private fun setButtonNavigate(button: ButtonModel) {
-        NavigateEvent(
-            button.action,
-            button.value ?: button.valueUrl,
-            title.toString()
+        storyFragmentCallback?.storyEvent(
+            NavigateEvent(
+                button.action,
+                button.value ?: button.valueUrl,
+                title.toString()
+            )
         )
     }
 
