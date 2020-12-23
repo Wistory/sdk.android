@@ -33,6 +33,7 @@ internal class VideoPlayer(
     private var trackSelector: DefaultTrackSelector? = null
     private var lastSeenTrackGroupArray: TrackGroupArray? = null
     private val videoTrackSelectionFactory = AdaptiveTrackSelection.Factory()
+
     private var currentWindow: Int = 0
     private var playbackPosition: Long = 0
 
@@ -96,6 +97,10 @@ internal class VideoPlayer(
     fun pause() {
         log("pause")
         player?.playWhenReady = false
+    }
+
+    fun volume(value: Float) {
+        player?.volume = value
     }
 
     fun destroy() {

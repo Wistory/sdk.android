@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -53,7 +54,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     private var videoPrepared = false
     private var videoPlayer: VideoPlayer? = null
     private var storyFragmentCallback: StoryFragmentCallback? = null
-
+    private var audioService: AudioManager? = null
     private val options = RequestOptions()
         .skipMemoryCache(false)
         .transform(CenterCrop(), RoundedCorners(16))
@@ -70,8 +71,8 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         private const val STATUSBAR_VERTICAL_BOTTOM_BIAS = 0.97f
         private const val STATUSBAR_VERTICAL_TOP_BIAS = 0.04f
         private const val statusMargin: Int = 16
-        private const val avatarMargin: Int = 20
-        private const val closeParenetTopMargin: Int = 26
+        private const val avatarMargin: Int = 24
+        private const val closeParentTopMargin: Int = 26
         private const val closeTopMargin: Int = 10
         private const val buttonMargin: Int = 24
         private const val buttonBetaMargin: Int = 96
@@ -102,7 +103,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        audioService = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         close.setOnClickListener {
             requireActivity().finish()
         }
@@ -222,6 +223,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun setTheme(model: SnapModel) {
+
         model.apply {
             themeConfig.let { theme ->
                 resources.apply {
@@ -233,7 +235,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                         )
                         tvStoryHeader.setTextColor(
                             resources.getColor(
-                                if (isLight) R.color.wistory_white else R.color.wistory_black
+                                if (isLight) R.color.wistory_black else R.color.wistory_white
                             )
                         )
                         footer.setColor(
@@ -259,6 +261,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         dislike.imageTintList = color
         favorite.imageTintList = color
         share.imageTintList = color
+        //  sound.imageTintList = color
         setupBottomButtons(story, color)
     }
 
@@ -294,10 +297,37 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
             getContentResource().let {
                 if (it.contains(".mp4")) {
                     setVideoContent(it)
+                    setVolume(this.vote?.soundVideo)
+                    sound.setOnClickListener {
+                        setSound()
+                    }
                 } else {
                     setImageContent(it)
                 }
             }
+        }
+    }
+
+    private fun setSound() {
+        if (sound.tag == R.drawable.ic_sound_on_white) {
+            doubleUpdateView(sound, R.drawable.ic_sound_off_white)
+            setVolume(false)
+        } else {
+            doubleUpdateView(sound, R.drawable.ic_sound_on_white)
+            setVolume(true)
+        }
+    }
+
+    private fun setVolume(soundVideo: Boolean? = true) {
+        sound.visibility = View.VISIBLE
+        if (soundVideo == false) {
+            videoPlayer?.volume(0f)
+            doubleUpdateView(sound, R.drawable.ic_sound_off_white)
+        } else if (soundVideo == true) {
+            videoPlayer?.volume(
+                audioService?.getStreamVolume(AudioManager.STREAM_MUSIC)?.toFloat() ?: 0.5f
+            )
+            doubleUpdateView(sound, R.drawable.ic_sound_on_white)
         }
     }
 
@@ -409,13 +439,13 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     private fun doubleUpdateView(
         firstView: ImageView,
         resUpdateFirstView: Int,
-        lastView: ImageView,
-        resUpdateLastView: Int
+        lastView: ImageView? = null,
+        resUpdateLastView: Int? = null
     ) {
         firstView.tag = resUpdateFirstView
         firstView.setImageDrawable(resources.getDrawable(resUpdateFirstView))
-        lastView.tag = resUpdateLastView
-        lastView.setImageDrawable(resources.getDrawable(resUpdateLastView))
+        lastView?.tag = resUpdateLastView
+        lastView?.setImageDrawable(resUpdateLastView?.let { resources.getDrawable(it) })
     }
 
     private fun setVideoContent(content: String) {
@@ -591,7 +621,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                         constraintSet.setMargin(
                             close.id,
                             ConstraintSet.TOP,
-                            pxToDp(closeParenetTopMargin)
+                            pxToDp(closeParentTopMargin)
                         )
                         constraintSet.setMargin(
                             headerAvatar.id,
@@ -748,6 +778,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                 if (typeStory == TypeStory.VIDEO_TYPE && videoPlayer?.isPlaying() == false) {
                     if (videoPrepared)
                         startVideo()
+
                 } else {
                     if (storiesStatus != null && image?.drawable != null) {
                         storiesStatus.resume()
@@ -847,8 +878,9 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         var storyHaveVideo = false
         val story = requireArguments().getSerializable(ARG_STORY) as Story
         story.content.map {
-            if (it.video?.contains(".mp4") == true)
+            if (it.video?.contains(".mp4") == true) {
                 storyHaveVideo = true
+            }
         }
         if (storyHaveVideo) {
             videoPlayer = VideoPlayer(requireContext(), mPlayerView, this)

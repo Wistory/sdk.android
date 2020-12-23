@@ -207,11 +207,15 @@
             app:layout_constraintStart_toEndOf="@id/headerAvatar"
             app:layout_constraintTop_toTopOf="@id/headerAvatar" />
 
+
         <ImageView
+            android:visibility="gone"
             android:id="@+id/sound"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="2dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:paddingStart="28dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
             android:src="@drawable/ic_sound_on_white"
             app:layout_constraintBottom_toBottomOf="@id/close"
             app:layout_constraintEnd_toStartOf="@id/close"
