@@ -350,10 +350,13 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
     private fun setSharing(idStory: String) {
         share.setOnClickListener {
-            val shareIntent = Intent(Intent.ACTION_SEND)
-            shareIntent.type = "text/plain"
-            shareIntent.putExtra(Intent.EXTRA_TEXT, context?.resources?.getString(R.string.sharing_url,idStory))
-            startActivity(Intent.createChooser(shareIntent, ""))
+            val shareIntent = Intent.createChooser(Intent().apply {
+                action = Intent.ACTION_SEND
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, context?.resources?.getString(R.string.sharing_url,idStory))
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            },null)
+            startActivity(shareIntent)
         }
     }
 
