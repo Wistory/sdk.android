@@ -11,6 +11,7 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
@@ -371,33 +372,50 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun setLike(liked: String?) {
 
-        if (liked == STORY_RELATION_LIKE) {
-            like.setImageDrawable(
-                if (like.tag == R.drawable.wistory_ic_like) {
-                    like.tag = R.drawable.wistory_ic_not_like
-                    dislike.tag = R.drawable.wistory_ic_not_dislike
-                    resources.getDrawable(R.drawable.wistory_ic_not_like)
-                } else {
-                    like.tag = R.drawable.wistory_ic_like
-                    dislike.tag = R.drawable.wistory_ic_not_dislike
-                    dislike.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_not_dislike))
-                    resources.getDrawable(R.drawable.wistory_ic_like)
-                }
-            )
-        } else if (liked == STORY_RELATION_DISLIKE) {
-            dislike.setImageDrawable(
-                if (dislike.tag == R.drawable.wistory_ic_dislike) {
-                    dislike.tag = R.drawable.wistory_ic_not_dislike
-                    like.tag = R.drawable.wistory_ic_not_like
-                    resources.getDrawable(R.drawable.wistory_ic_not_dislike)
-                } else {
-                    dislike.tag = R.drawable.wistory_ic_dislike
-                    like.tag = R.drawable.wistory_ic_not_like
-                    like.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_not_like))
-                    resources.getDrawable(R.drawable.wistory_ic_dislike)
-                }
-            )
+        when (liked) {
+            STORY_RELATION_LIKE -> if (like.tag == R.drawable.wistory_ic_like)
+                doubleUpdateView(
+                    like,
+                    R.drawable.wistory_ic_not_like,
+                    dislike,
+                    R.drawable.wistory_ic_not_dislike
+                )
+            else
+                doubleUpdateView(
+                    like,
+                    R.drawable.wistory_ic_like,
+                    dislike,
+                    R.drawable.wistory_ic_not_dislike
+                )
+
+            STORY_RELATION_DISLIKE -> if (dislike.tag == R.drawable.wistory_ic_dislike)
+                doubleUpdateView(
+                    like,
+                    R.drawable.wistory_ic_not_like,
+                    dislike,
+                    R.drawable.wistory_ic_not_dislike
+                )
+            else
+                doubleUpdateView(
+                    like,
+                    R.drawable.wistory_ic_not_like,
+                    dislike,
+                    R.drawable.wistory_ic_dislike
+                )
         }
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun doubleUpdateView(
+        firstView: ImageView,
+        resUpdateFirstView: Int,
+        lastView: ImageView,
+        resUpdateLastView: Int
+    ) {
+        firstView.tag = resUpdateFirstView
+        firstView.setImageDrawable(resources.getDrawable(resUpdateFirstView))
+        lastView.tag = resUpdateLastView
+        lastView.setImageDrawable(resources.getDrawable(resUpdateLastView))
     }
 
     private fun setVideoContent(content: String) {
