@@ -74,6 +74,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         private const val avatarMargin: Int = 24
         private const val closeParentTopMargin: Int = 26
         private const val closeTopMargin: Int = 10
+        private const val closeEndMargin: Int = 8
         private const val buttonMargin: Int = 24
         private const val buttonBetaMargin: Int = 96
 
@@ -261,7 +262,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         dislike.imageTintList = color
         favorite.imageTintList = color
         share.imageTintList = color
-        //  sound.imageTintList = color
+        sound.imageTintList = color
         setupBottomButtons(story, color)
     }
 
@@ -310,10 +311,10 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
     private fun setSound() {
         if (sound.tag == R.drawable.ic_sound_on_white) {
-            doubleUpdateView(sound, R.drawable.ic_sound_off_white)
+            updateImageView(sound, R.drawable.ic_sound_off_white)
             setVolume(false)
         } else {
-            doubleUpdateView(sound, R.drawable.ic_sound_on_white)
+            updateImageView(sound, R.drawable.ic_sound_on_white)
             setVolume(true)
         }
     }
@@ -322,12 +323,12 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         sound.visibility = View.VISIBLE
         if (soundVideo == false) {
             videoPlayer?.volume(0f)
-            doubleUpdateView(sound, R.drawable.ic_sound_off_white)
+            updateImageView(sound, R.drawable.ic_sound_off_white)
         } else if (soundVideo == true) {
             videoPlayer?.volume(
                 audioService?.getStreamVolume(AudioManager.STREAM_MUSIC)?.toFloat() ?: 0.5f
             )
-            doubleUpdateView(sound, R.drawable.ic_sound_on_white)
+            updateImageView(sound, R.drawable.ic_sound_on_white)
         }
     }
 
@@ -404,14 +405,14 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
         when (liked) {
             STORY_RELATION_LIKE -> if (like.tag == R.drawable.wistory_ic_like)
-                doubleUpdateView(
+                updateImageView(
                     like,
                     R.drawable.wistory_ic_not_like,
                     dislike,
                     R.drawable.wistory_ic_not_dislike
                 )
             else
-                doubleUpdateView(
+                updateImageView(
                     like,
                     R.drawable.wistory_ic_like,
                     dislike,
@@ -419,14 +420,14 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                 )
 
             STORY_RELATION_DISLIKE -> if (dislike.tag == R.drawable.wistory_ic_dislike)
-                doubleUpdateView(
+                updateImageView(
                     like,
                     R.drawable.wistory_ic_not_like,
                     dislike,
                     R.drawable.wistory_ic_not_dislike
                 )
             else
-                doubleUpdateView(
+                updateImageView(
                     like,
                     R.drawable.wistory_ic_not_like,
                     dislike,
@@ -436,7 +437,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    private fun doubleUpdateView(
+    private fun updateImageView(
         firstView: ImageView,
         resUpdateFirstView: Int,
         lastView: ImageView? = null,
@@ -596,7 +597,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                         constraintSet.setMargin(
                             close.id,
                             ConstraintSet.END,
-                            pxToDp(statusMargin)
+                            pxToDp(closeEndMargin)
                         )
                         constraintSet.setMargin(
                             close.id,
@@ -631,7 +632,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                         constraintSet.setMargin(
                             close.id,
                             ConstraintSet.END,
-                            pxToDp(statusMargin)
+                            pxToDp(closeEndMargin)
                         )
                     }
                 }

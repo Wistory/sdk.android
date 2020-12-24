@@ -209,11 +209,11 @@
 
 
         <ImageView
-            android:visibility="gone"
             android:id="@+id/sound"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:paddingStart="28dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="8dp"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:src="@drawable/ic_sound_on_white"
@@ -226,9 +226,9 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:contentDescription="@null"
-            android:paddingStart="20dp"
+            android:paddingStart="12dp"
             android:paddingTop="10dp"
-            android:paddingEnd="4dp"
+            android:paddingEnd="12dp"
             android:paddingBottom="10dp"
             android:src="@drawable/wistory_ic_close"
             android:tint="#fff"
