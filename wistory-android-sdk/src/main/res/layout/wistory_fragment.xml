@@ -191,54 +191,52 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
-            android:id="@+id/wrapperHeader"
-            android:layout_width="wrap_content"
+
+        <ImageView
+            android:id="@+id/headerAvatar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintBottom_toBottomOf="@+id/close"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/close" />
+
+        <TextView
+            android:id="@+id/tvStoryHeader"
+            android:layout_width="255dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginStart="9dp"
+            android:textSize="14sp"
+            app:layout_constraintStart_toEndOf="@id/headerAvatar"
+            app:layout_constraintTop_toTopOf="@id/headerAvatar" />
+
+
+        <ImageView
+            android:id="@+id/sound"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="8dp"
             android:paddingTop="10dp"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/llClose"
-            app:layout_constraintLeft_toLeftOf="@id/storiesStatus"
-            app:layout_constraintTop_toTopOf="@+id/llClose">
+            android:paddingBottom="10dp"
+            android:src="@drawable/ic_sound_on_white"
+            app:layout_constraintBottom_toBottomOf="@id/close"
+            app:layout_constraintEnd_toStartOf="@id/close"
+            app:layout_constraintTop_toTopOf="@id/close" />
 
-            <ImageView
-                android:id="@+id/headerAvatar"
-                android:layout_width="32dp"
-                android:layout_height="32dp" />
-
-            <TextView
-                android:id="@+id/tvStoryHeader"
-                android:layout_width="255dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="9dp"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-
-        <FrameLayout
-            android:id="@+id/llClose"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageView
+            android:id="@+id/close"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@null"
+            android:paddingStart="12dp"
             android:paddingTop="10dp"
-            android:translationZ="1dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="10dp"
+            android:src="@drawable/wistory_ic_close"
+            android:tint="#fff"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/storiesStatus">
-
-            <ImageView
-                android:id="@+id/close"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginTop="10dp"
-                android:contentDescription="@null"
-                android:paddingLeft="4dp"
-                android:paddingTop="10dp"
-                android:paddingRight="20dp"
-                android:paddingBottom="10dp"
-                android:src="@drawable/wistory_ic_close"
-                android:tint="#fff" />
-        </FrameLayout>
+            app:layout_constraintTop_toBottomOf="@+id/storiesStatus" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
