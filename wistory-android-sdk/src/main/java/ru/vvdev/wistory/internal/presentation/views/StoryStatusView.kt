@@ -88,21 +88,15 @@ internal class StoryStatusView : LinearLayout {
                 setColor(Color.parseColor("#10$color"))
                 cornerRadius = 8.0f
             }
-        val secProgressDr =
-            GradientDrawable().apply {
-                setColor(Color.parseColor("#30$color"))
-                cornerRadius = 8.0f
-            }
         val progressDr =
             ScaleDrawable(GradientDrawable().apply {
                 setColor(Color.parseColor("#$color"))
                 cornerRadius = 8.0f
             }, Gravity.LEFT, 1f, -1f)
-        val resultDr = LayerDrawable(arrayOf(bckgrndDr, secProgressDr, progressDr))
+        val resultDr = LayerDrawable(arrayOf(bckgrndDr, progressDr))
 
         resultDr.setId(0, android.R.id.background)
-        resultDr.setId(1, android.R.id.secondaryProgress)
-        resultDr.setId(2, android.R.id.progress)
+        resultDr.setId(1, android.R.id.progress)
 
         return resultDr
     }
