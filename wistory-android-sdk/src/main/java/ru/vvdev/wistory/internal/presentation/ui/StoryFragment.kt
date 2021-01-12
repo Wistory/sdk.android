@@ -322,10 +322,10 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     private fun setVolume(soundVideo: Boolean? = true) {
         sound.visibility = View.VISIBLE
         if (soundVideo == false) {
-            videoPlayer?.volume(0f)
+            videoPlayer?.setVolume(0f)
             updateImageView(sound, R.drawable.ic_sound_off_white)
         } else if (soundVideo == true) {
-            videoPlayer?.volume(
+            videoPlayer?.setVolume(
                 audioService?.getStreamVolume(AudioManager.STREAM_MUSIC)?.toFloat() ?: 0.5f
             )
             updateImageView(sound, R.drawable.ic_sound_on_white)

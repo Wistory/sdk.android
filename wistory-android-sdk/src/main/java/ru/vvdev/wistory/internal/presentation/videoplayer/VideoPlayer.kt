@@ -99,7 +99,7 @@ internal class VideoPlayer(
         player?.playWhenReady = false
     }
 
-    fun volume(value: Float) {
+    fun setVolume(value: Float) {
         player?.volume = value
     }
 
