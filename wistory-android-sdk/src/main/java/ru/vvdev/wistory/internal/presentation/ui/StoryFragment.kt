@@ -298,7 +298,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
             getContentResource().let {
                 if (it.contains(".mp4")) {
                     setVideoContent(it)
-                    setVolume(this.vote?.soundVideo)
+                    setVolume(this.soundVideo)
                     sound.setOnClickListener {
                         setSound()
                     }
