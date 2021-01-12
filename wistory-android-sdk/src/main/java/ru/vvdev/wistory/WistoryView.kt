@@ -48,16 +48,22 @@ class WistoryView @JvmOverloads constructor(
                 getFragmentManager(context)
             }
         try {
-            fragmentManager?.beginTransaction()?.replace(
-                R.id.fragmentContainerView,
-                WistoryListFragment.newInstance(
-                    token ?: Wistory.token,
-                    serverUrl ?: Wistory.serverUrl,
-                    registrationId,
-                    config
-                ),
-                WistoryListFragment::class.java.simpleName
-            )?.commit()
+            fragmentManager?.fragments
+            fragmentManager?.apply {
+                findFragmentByTag(WistoryListFragment::class.java.simpleName)?.let {
+                    WistoryCommunication.getInstance().removeCallbackListener(it as WistoryListFragment)
+                }
+                beginTransaction().replace(
+                        R.id.fragmentContainerView,
+                        WistoryListFragment.newInstance(
+                            token ?: Wistory.token,
+                            serverUrl ?: Wistory.serverUrl,
+                            registrationId,
+                            config
+                        ),
+                        WistoryListFragment::class.java.simpleName
+                    ).commit()
+            }
         } catch (e: Exception) {
             e
         }

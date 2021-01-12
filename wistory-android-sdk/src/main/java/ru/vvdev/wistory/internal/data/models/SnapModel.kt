@@ -6,8 +6,9 @@ import ru.vvdev.wistory.UiConfig
 internal class SnapModel(
     val textBlock: TextModel?,
     var statusbar: ProgressbarModel?,
-    val image: String,
-    val video: String,
+    val image: String?,
+    val video: String?,
+    val gif: String?,
     var enableGradient: Boolean,
     val button: ButtonModel?,
     val duration: String,
@@ -29,5 +30,10 @@ internal class SnapModel(
                 "light"
         }
 
-    fun getContentResource() = takeIf { !video.isNullOrEmpty() }?.let { video }?:let { image }
+
+    fun getContentResource() = when {
+        !video.isNullOrEmpty() -> video
+        !gif.isNullOrEmpty() -> gif
+        else -> image
+    }
 }
