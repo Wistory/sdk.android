@@ -49,8 +49,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
-
-            <RelativeLayout
+          
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/wrapper"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -76,15 +77,17 @@
                     app:surface_type="texture_view"
                     app:use_controller="false" />
 
-                <ImageView
-                    android:id="@+id/gradient"
-                    android:layout_width="match_parent"
-                    android:layout_height="300dp"
-                    android:layout_alignParentBottom="true"
-                    android:contentDescription="@null" />
+                    <ImageView
+                        android:id="@+id/gradient"
+                        android:elevation="4dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        app:layout_constraintHeight_percent="0.2"
+                        android:layout_alignParentBottom="true"
+                        android:contentDescription="@null"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
 
-            </RelativeLayout>
-
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 
 
@@ -146,7 +149,7 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/action_button"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="64dp"
             android:layout_above="@id/storiesStatus"
             android:paddingLeft="32dp"
             android:paddingTop="12dp"
@@ -291,6 +294,7 @@
                 android:layout_gravity="right"
                 android:padding="2dp"
                 android:src="@drawable/wistory_ic_share" />
+
         </FrameLayout>
 
     </LinearLayout>

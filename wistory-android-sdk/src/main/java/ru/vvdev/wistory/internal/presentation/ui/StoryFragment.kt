@@ -2,6 +2,7 @@ package ru.vvdev.wistory.internal.presentation.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.Drawable
@@ -69,7 +70,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         private const val STORY_HEADER_LENGTH = 43
         private const val STATUSBAR_VERTICAL_BOTTOM_BIAS = 0.97f
         private const val STATUSBAR_VERTICAL_TOP_BIAS = 0.04f
-        private const val statusMargin: Int = 16
+        private const val statusMargin: Int = 20
         private const val buttonMargin: Int = 24
         private const val buttonBetaMargin: Int = 96
 
@@ -221,6 +222,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun setTheme(model: SnapModel) {
+
         model.apply {
             themeConfig.let { theme ->
                 resources.apply {
@@ -270,7 +272,6 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
     private fun setValues(story: Story, uiConfig: UiConfig) {
         videoPrepared = false
-
         createStoryHeader(story)
 
         story.content[getCurrentSnap()].apply {
@@ -287,6 +288,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                 setTextStory(this)
 
             setFormat(uiConfig.format)
+            setSharing(story._id)
 
             videoPlayer?.releasePlayer()
 
@@ -416,6 +418,18 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         firstView.setImageDrawable(resources.getDrawable(resUpdateFirstView))
         lastView.tag = resUpdateLastView
         lastView.setImageDrawable(resources.getDrawable(resUpdateLastView))
+    }
+      
+    private fun setSharing(idStory: String) {
+        share.setOnClickListener {
+            val shareIntent = Intent.createChooser(Intent().apply {
+                action = Intent.ACTION_SEND
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, context?.resources?.getString(R.string.sharing_url,idStory))
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            },null)
+            startActivity(shareIntent)
+        }
     }
 
     private fun setVideoContent(content: String) {
