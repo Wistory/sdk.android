@@ -2,6 +2,7 @@ package ru.vvdev.wistory.internal.presentation.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.Drawable
@@ -75,6 +76,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         private const val closeParentTopMargin: Int = 26
         private const val closeTopMargin: Int = 10
         private const val closeEndMargin: Int = 8
+
         private const val buttonMargin: Int = 24
         private const val buttonBetaMargin: Int = 96
 
@@ -275,7 +277,6 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
     private fun setValues(story: Story, uiConfig: UiConfig) {
         videoPrepared = false
-
         createStoryHeader(story)
 
         story.content[getCurrentSnap()].apply {
@@ -292,6 +293,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                 setTextStory(this)
 
             setFormat(uiConfig.format)
+            setSharing(story._id)
 
             videoPlayer?.releasePlayer()
 
@@ -447,6 +449,18 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         firstView.setImageDrawable(resources.getDrawable(resUpdateFirstView))
         lastView?.tag = resUpdateLastView
         lastView?.setImageDrawable(resUpdateLastView?.let { resources.getDrawable(it) })
+    }
+      
+    private fun setSharing(idStory: String) {
+        share.setOnClickListener {
+            val shareIntent = Intent.createChooser(Intent().apply {
+                action = Intent.ACTION_SEND
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, context?.resources?.getString(R.string.sharing_url,idStory))
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            },null)
+            startActivity(shareIntent)
+        }
     }
 
     private fun setVideoContent(content: String) {
