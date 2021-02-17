@@ -1,4 +1,4 @@
-package ru.vvdev.wistory.internal.presentation.videoplayer
+   package ru.vvdev.wistory.internal.presentation.videoplayer
 
 import android.content.Context
 import android.graphics.Color
@@ -8,6 +8,7 @@ import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ExtractorMediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
@@ -41,7 +42,7 @@ internal class VideoPlayer(
         mediaDataSourceFactory =
             DefaultDataSourceFactory(context, Util.getUserAgent(context, "mediaPlayerSample"))
         trackSelector?.let {
-            player = ExoPlayerFactory.newSimpleInstance(context, it)
+            player = SimpleExoPlayer.Builder(context).setTrackSelector(it).build()
         }
     }
 
@@ -59,11 +60,11 @@ internal class VideoPlayer(
         mediaDataSourceFactory =
             DefaultDataSourceFactory(context, Util.getUserAgent(context, "mediaPlayerSample"))
         trackSelector?.let {
-            player = ExoPlayerFactory.newSimpleInstance(context, it)
+            player = SimpleExoPlayer.Builder(context).setTrackSelector(it).build()
         }
         log("initializePlayer")
 
-        val mediaSource = ExtractorMediaSource.Factory(mediaDataSourceFactory)
+        val mediaSource = ProgressiveMediaSource.Factory(mediaDataSourceFactory)
             .createMediaSource(Uri.parse(uri))
 
         player?.apply {
