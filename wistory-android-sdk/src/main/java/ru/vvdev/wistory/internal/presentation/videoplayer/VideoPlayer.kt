@@ -1,5 +1,6 @@
    package ru.vvdev.wistory.internal.presentation.videoplayer
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.net.Uri
@@ -19,6 +20,7 @@ import com.google.android.exoplayer2.util.Util
 import com.google.android.exoplayer2.video.VideoListener
 import ru.vvdev.wistory.R
 
+@Suppress("IMPLICIT_BOXING_IN_IDENTITY_EQUALS")
 internal class VideoPlayer(
     private val context: Context,
     private val mPlayerView: PlayerView,
@@ -38,7 +40,7 @@ internal class VideoPlayer(
     private var playbackPosition: Long = 0
 
     init {
-        trackSelector = DefaultTrackSelector(videoTrackSelectionFactory)
+        trackSelector = DefaultTrackSelector(context, videoTrackSelectionFactory)
         mediaDataSourceFactory =
             DefaultDataSourceFactory(context, Util.getUserAgent(context, "mediaPlayerSample"))
         trackSelector?.let {
@@ -56,7 +58,7 @@ internal class VideoPlayer(
     }
 
     fun initializePlayer(uri: String) {
-        trackSelector = DefaultTrackSelector(videoTrackSelectionFactory)
+        trackSelector = DefaultTrackSelector(context, videoTrackSelectionFactory)
         mediaDataSourceFactory =
             DefaultDataSourceFactory(context, Util.getUserAgent(context, "mediaPlayerSample"))
         trackSelector?.let {
@@ -79,6 +81,7 @@ internal class VideoPlayer(
         lastSeenTrackGroupArray = null
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     fun releasePlayer() {
         log("releasePlayer")
         updateStartPosition()
@@ -118,7 +121,6 @@ internal class VideoPlayer(
         when (playbackState) {
             Player.STATE_READY -> {
                 mPlayerView.foreground = null
-
                 callbacks.videoReady(playWhenReady)
             }
             Player.STATE_IDLE -> {
@@ -130,8 +132,7 @@ internal class VideoPlayer(
             Player.STATE_ENDED -> {
                 callbacks.videoEnd(playWhenReady)
             }
-            else -> {
-            }
+            else -> {}
         }
         super.onPlayerStateChanged(playWhenReady, playbackState)
     }
