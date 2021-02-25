@@ -1,24 +1,26 @@
-   package ru.vvdev.wistory.internal.presentation.videoplayer
+package ru.vvdev.wistory.internal.presentation.videoplayer
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.net.Uri
 import android.util.Log
-import com.google.android.exoplayer2.ExoPlayerFactory
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DataSource
+import com.google.android.exoplayer2.upstream.DefaultAllocator
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.android.exoplayer2.video.VideoListener
 import ru.vvdev.wistory.R
+import ru.vvdev.wistory.Wistory
+
 
 @Suppress("IMPLICIT_BOXING_IN_IDENTITY_EQUALS")
 internal class VideoPlayer(
@@ -31,23 +33,24 @@ internal class VideoPlayer(
     }
 
     private var player: SimpleExoPlayer? = null
-    private var mediaDataSourceFactory: DataSource.Factory
+    private lateinit var mediaDataSourceFactory: DataSource.Factory
 
     private var trackSelector: DefaultTrackSelector? = null
-    private var lastSeenTrackGroupArray: TrackGroupArray? = null
     private val videoTrackSelectionFactory = AdaptiveTrackSelection.Factory()
     private var currentWindow: Int = 0
     private var playbackPosition: Long = 0
 
-    init {
-        trackSelector = DefaultTrackSelector(context, videoTrackSelectionFactory)
-        mediaDataSourceFactory =
-            DefaultDataSourceFactory(context, Util.getUserAgent(context, "mediaPlayerSample"))
-        trackSelector?.let {
-            player = SimpleExoPlayer.Builder(context).setTrackSelector(it).build()
+    /*
+        init {
+            trackSelector = DefaultTrackSelector(context, videoTrackSelectionFactory)
+            mediaDataSourceFactory =
+                DefaultDataSourceFactory(context, Util.getUserAgent(context, "mediaPlayerSample"))
+            trackSelector?.let {
+                player = SimpleExoPlayer.Builder(context).setTrackSelector(it).build()
+            }
         }
-    }
 
+        */
     private fun updateStartPosition() {
         log("updateStartPosition")
         player?.apply {
@@ -58,11 +61,18 @@ internal class VideoPlayer(
     }
 
     fun initializePlayer(uri: String) {
+        val allocator = DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE)
+        val loadControl = DefaultLoadControl(allocator, 360000, 600000, 2500, 5000, -1, true)
         trackSelector = DefaultTrackSelector(context, videoTrackSelectionFactory)
         mediaDataSourceFactory =
-            DefaultDataSourceFactory(context, Util.getUserAgent(context, "mediaPlayerSample"))
+            DefaultDataSourceFactory(
+                context,
+                Util.getUserAgent(context, Wistory::class.java.simpleName)
+            )
         trackSelector?.let {
-            player = SimpleExoPlayer.Builder(context).setTrackSelector(it).build()
+            player =
+                SimpleExoPlayer.Builder(context).setTrackSelector(it).setLoadControl(loadControl)
+                    .build()
         }
         log("initializePlayer")
 
@@ -70,15 +80,13 @@ internal class VideoPlayer(
             .createMediaSource(Uri.parse(uri))
 
         player?.apply {
-            prepare(mediaSource, false, false)
+            prepare(mediaSource, true, true)
             playWhenReady = true
             addListener(this@VideoPlayer)
         }
         mPlayerView.setShutterBackgroundColor(Color.TRANSPARENT)
         mPlayerView.player = player
         mPlayerView.requestFocus()
-
-        lastSeenTrackGroupArray = null
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -132,7 +140,8 @@ internal class VideoPlayer(
             Player.STATE_ENDED -> {
                 callbacks.videoEnd(playWhenReady)
             }
-            else -> {}
+            else -> {
+            }
         }
         super.onPlayerStateChanged(playWhenReady, playbackState)
     }

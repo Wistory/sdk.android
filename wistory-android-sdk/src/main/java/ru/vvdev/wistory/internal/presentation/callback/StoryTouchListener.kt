@@ -5,6 +5,7 @@ import android.os.Handler
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import androidx.core.view.GestureDetectorCompat
 import kotlin.math.abs
 import ru.vvdev.wistory.R
 
@@ -16,10 +17,10 @@ open class StoryTouchListener(context: Context) : View.OnTouchListener {
     private val MAX_CLICK_DURATION = 500L
     private var startClickTime: Long = 0
 
-    private val gestureDetector: GestureDetector
+    private val gestureDetector: GestureDetectorCompat
 
     init {
-        gestureDetector = GestureDetector(context, GestureListener())
+        gestureDetector = GestureDetectorCompat(context, GestureListener())
     }
 
     open fun onSwipeTop() = false
@@ -60,7 +61,7 @@ open class StoryTouchListener(context: Context) : View.OnTouchListener {
 
     private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
 
-        override fun onSingleTapUp(event: MotionEvent): Boolean {
+        override fun onSingleTapUp(e: MotionEvent?): Boolean {
             return true
         }
 

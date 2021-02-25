@@ -750,6 +750,8 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
         if (isFragmentEnabled && !storyPlayAgain) {
             startVideo()
+        } else {
+
         }
         videoPrepared = true
     }
