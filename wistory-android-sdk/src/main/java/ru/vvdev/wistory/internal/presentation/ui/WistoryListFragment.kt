@@ -1,7 +1,6 @@
 package ru.vvdev.wistory.internal.presentation.ui
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -113,7 +112,10 @@ internal class WistoryListFragment : Fragment(), StoryEventListener,
             viewModel.clearUpdated()
         }
         viewModel.errorLiveData.sub {
-            postException(it)
+            it?.let {
+                postException(it)
+                viewModel.errorLiveData.value = null
+            }
         }
     }
 
@@ -168,6 +170,7 @@ internal class WistoryListFragment : Fragment(), StoryEventListener,
     }
 
     private fun initListener() {
+        WistoryCommunication.getInstance().removeCallbackListener(this)
         WistoryCommunication.getInstance().addCallBackListener(this)
     }
 
@@ -181,12 +184,12 @@ internal class WistoryListFragment : Fragment(), StoryEventListener,
                         removeRange(it.size, currentItemsCount - it.size)
                     }
                     list.forEachIndexed { index, story ->
-                        val story = if (story.fresh)
-                            StoryItem(context, story, this@WistoryListFragment)
-                        else
-                            ReadedStoryItem(context, story, this@WistoryListFragment)
-
-                        addOrUpdateItems(index, story)
+                        addOrUpdateItems(
+                            index, if (story.fresh)
+                                StoryItem(context, story, this@WistoryListFragment)
+                            else
+                                ReadedStoryItem(context, story, this@WistoryListFragment)
+                        )
                     }
                 }
             }

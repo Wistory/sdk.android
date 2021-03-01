@@ -2,21 +2,25 @@ package ru.vvdev.wistory.internal.presentation.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.DrawableImageViewTarget
 import com.bumptech.glide.request.target.Target
@@ -51,22 +55,28 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     private var videoPrepared = false
     private var videoPlayer: VideoPlayer? = null
     private var storyFragmentCallback: StoryFragmentCallback? = null
-
+    private var audioService: AudioManager? = null
     private val options = RequestOptions()
         .skipMemoryCache(false)
-        .transform(CenterCrop())
+        .transform(CenterCrop(), RoundedCorners(16))
         .diskCacheStrategy(DiskCacheStrategy.ALL)
 
     companion object {
         private const val ARG_STORY = "STORY"
         private const val ARG_STORY_POSITION = "POS"
         private const val ARG_STORY_SETTINGS = "SETTINGS"
-        private const val STORY_FIXED_RATIO = "9:14.7"
+        private const val STORY_FIXED_RATIO = "9:14.6"
         private const val STORY_RELATION_LIKE = "like"
         private const val STORY_RELATION_DISLIKE = "dislike"
+        private const val STORY_HEADER_LENGTH = 43
         private const val STATUSBAR_VERTICAL_BOTTOM_BIAS = 0.97f
         private const val STATUSBAR_VERTICAL_TOP_BIAS = 0.04f
         private const val statusMargin: Int = 16
+        private const val avatarMargin: Int = 24
+        private const val closeParentTopMargin: Int = 26
+        private const val closeTopMargin: Int = 10
+        private const val closeEndMargin: Int = 8
+
         private const val buttonMargin: Int = 24
         private const val buttonBetaMargin: Int = 96
 
@@ -96,7 +106,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        audioService = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         close.setOnClickListener {
             requireActivity().finish()
         }
@@ -210,13 +220,13 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         }
 
         storiesStatus.setPadding(pxToDp(statusMargin), 0, pxToDp(statusMargin), 0)
-        llClose.setPadding(pxToDp(statusMargin), 0, 0, 0)
 
         constraintSet.applyTo(baseLayout)
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun setTheme(model: SnapModel) {
+
         model.apply {
             themeConfig.let { theme ->
                 resources.apply {
@@ -225,6 +235,11 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                         gradient.background = if (model.enableGradient)
                             getDrawable(if (isLight) R.drawable.wistory_gradient_lignt else R.drawable.wistory_gradient_dark) else getDrawable(
                             android.R.color.transparent
+                        )
+                        tvStoryHeader.setTextColor(
+                            resources.getColor(
+                                if (isLight) R.color.wistory_black else R.color.wistory_white
+                            )
                         )
                         footer.setColor(
                             it,
@@ -245,17 +260,24 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     }
 
     private fun colorButton(color: ColorStateList) {
-        if (like.imageTintList != ColorStateList.valueOf(resources.getColor(R.color.wistory_gray)))
-            like.imageTintList = color
-        if (dislike.imageTintList != ColorStateList.valueOf(resources.getColor(R.color.wistory_gray)))
-            dislike.imageTintList = color
+        like.imageTintList = color
+        dislike.imageTintList = color
         favorite.imageTintList = color
+        share.imageTintList = color
+        sound.imageTintList = color
+        setupBottomButtons(story)
+    }
 
-        setupBottomButtons(story, color)
+    private fun setStoryHeaderText(title: String) {
+        tvStoryHeader.text = if (title.length > STORY_HEADER_LENGTH)
+            "${title.trim('\n', ' ').substring(0, STORY_HEADER_LENGTH)}..."
+        else
+            title
     }
 
     private fun setValues(story: Story, uiConfig: UiConfig) {
         videoPrepared = false
+        createStoryHeader(story)
 
         story.content[getCurrentSnap()].apply {
 
@@ -271,12 +293,17 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                 setTextStory(this)
 
             setFormat(uiConfig.format)
+            setSharing(story._id)
 
             videoPlayer?.releasePlayer()
 
-            image.let {
+            getContentResource()?.let {
                 if (it.contains(".mp4")) {
                     setVideoContent(it)
+                    setVolume(this.soundVideo)
+                    sound.setOnClickListener {
+                        setSound()
+                    }
                 } else {
                     setImageContent(it)
                 }
@@ -284,18 +311,51 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         }
     }
 
-    private fun setupBottomButtons(story: Story, color: ColorStateList) {
+    private fun setSound() {
+        if (sound.tag == R.drawable.ic_sound_on_white) {
+            updateImageView(sound, R.drawable.ic_sound_off_white)
+            setVolume(false)
+        } else {
+            updateImageView(sound, R.drawable.ic_sound_on_white)
+            setVolume(true)
+        }
+    }
+
+    private fun setVolume(soundVideo: Boolean? = true) {
+        sound.visibility = View.VISIBLE
+        if (soundVideo == false) {
+            videoPlayer?.setVolume(0f)
+            updateImageView(sound, R.drawable.ic_sound_off_white)
+        } else if (soundVideo == true) {
+            videoPlayer?.setVolume(
+                audioService?.getStreamVolume(AudioManager.STREAM_MUSIC)?.toFloat() ?: 0.5f
+            )
+            updateImageView(sound, R.drawable.ic_sound_on_white)
+        }
+    }
+
+    private fun createStoryHeader(story: Story) {
+        if (story.thumbnail.isNotEmpty() && story.title.isNotEmpty()) {
+            Glide.with(requireContext())
+                .load(story.thumbnail)
+                .apply(RequestOptions().transforms(CenterCrop(), RoundedCorners(60)))
+                .into(headerAvatar)
+            setStoryHeaderText(story.title)
+        }
+    }
+
+    private fun setupBottomButtons(story: Story) {
 
         val position: Int = arguments?.getSerializable(ARG_STORY_POSITION) as Int
 
-        setLike(story.relation, color)
+        setLike(story.relation)
         setFavoriteIcon(story.favorite)
 
         like.setOnClickListener {
-            updateRelation(story, position, color, STORY_RELATION_LIKE)
+            updateRelation(story, position, STORY_RELATION_LIKE)
         }
         dislike.setOnClickListener {
-            updateRelation(story, position, color, STORY_RELATION_DISLIKE)
+            updateRelation(story, position, STORY_RELATION_DISLIKE)
         }
         favorite.setOnClickListener {
             val isFavorite =
@@ -314,15 +374,24 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     private fun updateRelation(
         story: Story,
         position: Int,
-        color: ColorStateList,
         relation: String
     ) {
-        setLike(relation, color)
+        setLike(relation)
+
         storyFragmentCallback?.storyEvent(RelationEvent(story.apply {
-            this.relation = relation
-        }, relation, position))
+            this.relation = getRelationValue().toString()
+        }, getRelationValue().toString(), position))
     }
 
+    private fun getRelationValue(): String? {
+        return when (like.tag) {
+            R.drawable.wistory_ic_like -> STORY_RELATION_LIKE
+            R.drawable.wistory_ic_dislike -> STORY_RELATION_DISLIKE
+            else -> null
+        }
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun setFavoriteIcon(fav: Boolean) {
         if (fav) {
             favorite.setImageDrawable(resources.getDrawable(R.drawable.wistory_ic_favorite))
@@ -333,18 +402,64 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         }
     }
 
-    private fun setLike(liked: String, color: ColorStateList) {
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun setLike(liked: String?) {
 
-        if (liked == "like") {
-            like.imageTintList = color
-            dislike.imageTintList =
-                ColorStateList.valueOf(resources.getColor(R.color.wistory_gray))
-            like.tag = R.drawable.wistory_ic_like
-        } else if (liked == "dislike") {
-            like.imageTintList =
-                ColorStateList.valueOf(resources.getColor(R.color.wistory_gray))
-            dislike.imageTintList = color
-            dislike.tag = R.drawable.wistory_ic_dislike
+        when (liked) {
+            STORY_RELATION_LIKE -> if (like.tag == R.drawable.wistory_ic_like)
+                updateImageView(
+                    like,
+                    R.drawable.wistory_ic_not_like,
+                    dislike,
+                    R.drawable.wistory_ic_not_dislike
+                )
+            else
+                updateImageView(
+                    like,
+                    R.drawable.wistory_ic_like,
+                    dislike,
+                    R.drawable.wistory_ic_not_dislike
+                )
+
+            STORY_RELATION_DISLIKE -> if (dislike.tag == R.drawable.wistory_ic_dislike)
+                updateImageView(
+                    like,
+                    R.drawable.wistory_ic_not_like,
+                    dislike,
+                    R.drawable.wistory_ic_not_dislike
+                )
+            else
+                updateImageView(
+                    like,
+                    R.drawable.wistory_ic_not_like,
+                    dislike,
+                    R.drawable.wistory_ic_dislike
+                )
+        }
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun updateImageView(
+        firstView: ImageView,
+        resUpdateFirstView: Int,
+        lastView: ImageView? = null,
+        resUpdateLastView: Int? = null
+    ) {
+        firstView.tag = resUpdateFirstView
+        firstView.setImageDrawable(resources.getDrawable(resUpdateFirstView))
+        lastView?.tag = resUpdateLastView
+        lastView?.setImageDrawable(resUpdateLastView?.let { resources.getDrawable(it) })
+    }
+      
+    private fun setSharing(idStory: String) {
+        share.setOnClickListener {
+            val shareIntent = Intent.createChooser(Intent().apply {
+                action = Intent.ACTION_SEND
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, context?.resources?.getString(R.string.sharing_url,idStory))
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            },null)
+            startActivity(shareIntent)
         }
     }
 
@@ -352,6 +467,8 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         typeStory = TypeStory.VIDEO_TYPE
         imageProgressBar.visibility = View.VISIBLE
         setVideoVisible()
+        videoPlayer?.destroy()
+        videoPlayer?.releasePlayer()
         videoPlayer?.initializePlayer(content)
     }
 
@@ -404,7 +521,9 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         storyFragmentCallback?.storyEvent(StoryNextEvent(story))
 
         for (s in story.content) {
-            statusResources.add(s.image)
+            s.getContentResource()?.let {
+                statusResources.add(it)
+            }
         }
 
         var arr = ArrayList<Long>()
@@ -492,15 +611,46 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                 when (alignmentConfig) {
                     UiConfig.VerticalAlignment.TOP -> {
                         constraintSet.setVerticalBias(id, STATUSBAR_VERTICAL_TOP_BIAS)
-                        constraintSet.connect(llClose.id, ConstraintSet.TOP, id, ConstraintSet.TOP)
+                        constraintSet.connect(close.id, ConstraintSet.TOP, id, ConstraintSet.TOP)
+                        constraintSet.setMargin(
+                            close.id,
+                            ConstraintSet.END,
+                            pxToDp(closeEndMargin)
+                        )
+                        constraintSet.setMargin(
+                            close.id,
+                            ConstraintSet.TOP,
+                            pxToDp(closeTopMargin)
+                        )
+                        constraintSet.setMargin(
+                            headerAvatar.id,
+                            ConstraintSet.START,
+                            pxToDp(avatarMargin)
+                        )
+
                     }
                     UiConfig.VerticalAlignment.BOTTOM -> {
                         constraintSet.setVerticalBias(id, STATUSBAR_VERTICAL_BOTTOM_BIAS)
                         constraintSet.connect(
-                            llClose.id,
+                            close.id,
                             ConstraintSet.TOP,
                             baseLayout.id,
                             ConstraintSet.TOP
+                        )
+                        constraintSet.setMargin(
+                            close.id,
+                            ConstraintSet.TOP,
+                            pxToDp(closeParentTopMargin)
+                        )
+                        constraintSet.setMargin(
+                            headerAvatar.id,
+                            ConstraintSet.START,
+                            pxToDp(avatarMargin)
+                        )
+                        constraintSet.setMargin(
+                            close.id,
+                            ConstraintSet.END,
+                            pxToDp(closeEndMargin)
                         )
                     }
                 }
@@ -567,7 +717,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                     constraintSet.connect(
                         textBlock.id,
                         ConstraintSet.TOP,
-                        llClose.id,
+                        close.id,
                         ConstraintSet.BOTTOM
                     )
                 }
@@ -590,7 +740,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                     constraintSet.connect(
                         textBlock.id,
                         ConstraintSet.TOP,
-                        llClose.id,
+                        close.id,
                         ConstraintSet.BOTTOM
                     )
                 }
@@ -647,6 +797,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                 if (typeStory == TypeStory.VIDEO_TYPE && videoPlayer?.isPlaying() == false) {
                     if (videoPrepared)
                         startVideo()
+
                 } else {
                     if (storiesStatus != null && image?.drawable != null) {
                         storiesStatus.resume()
@@ -726,12 +877,6 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         VIDEO_TYPE, IMAGE_TYPE
     }
 
-    override fun videoBuffering(playWhenReady: Boolean) {}
-
-    override fun videoEnd(playWhenReady: Boolean) {}
-
-    override fun videoIdle(playWhenReady: Boolean) {}
-
     override fun videoReady(playWhenReady: Boolean) {
 
         if (isFragmentEnabled && !storyPlayAgain) {
@@ -745,9 +890,12 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
         var storyHaveVideo = false
         val story = requireArguments().getSerializable(ARG_STORY) as Story
-        story.content.map {
-            if (it.image.contains(".mp4"))
-                storyHaveVideo = true
+
+        story.content.map { snapModel ->
+            snapModel.getContentResource()?.let {
+                if (it.contains(".mp4"))
+                    storyHaveVideo = true
+            }
         }
         if (storyHaveVideo) {
             videoPlayer = VideoPlayer(requireContext(), mPlayerView, this)
@@ -763,13 +911,12 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         super.onPause()
         storiesStatus?.destroy()
         videoPlayer?.destroy()
-        if (Util.SDK_INT <= 23) videoPlayer?.releasePlayer()
+        videoPlayer?.releasePlayer()
     }
 
     override fun onStop() {
         super.onStop()
-
-        if (Util.SDK_INT > 23) videoPlayer?.releasePlayer()
+        videoPlayer?.releasePlayer()
         videoPlayer = null
     }
 

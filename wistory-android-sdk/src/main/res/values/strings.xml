@@ -1,4 +1,8 @@
 <resources>
-    <string name="wistory_base_url" translatable="false">https://api.wistory.io/</string>
+    <string name="wistory_base_url" translatable="false">https://api.wistory.io/api/</string>
+    <string name="wistory_dev_url" translatable="false">https://wistorybacktest.vvdev.ru/api/</string>
+
     <string name="wistory_favorite">Избранное</string>
+    <string name="sharing_url">https://wistory.io/story/%1$s</string>
+
 </resources>

@@ -4,31 +4,20 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT
+import com.google.android.material.snackbar.Snackbar
+import java.lang.Exception
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.vvdev.wistory.UiConfig
 import ru.vvdev.wistory.internal.presentation.callback.StoryEventListener
 
 class MainActivity : AppCompatActivity(), StoryEventListener {
 
+    private var baseServer: Int = R.string.wistory_dev_url
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        etToken.addTextChangedListener(object : TextWatcher {
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-            }
-
-            override fun beforeTextChanged(
-                s: CharSequence?,
-                start: Int,
-                count: Int,
-                after: Int
-            ) {
-            }
-        })
 
         swipeToRefresh.setOnRefreshListener {
             applyStories()
@@ -37,6 +26,11 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
         swFullscreen.setOnCheckedChangeListener { _, isChecked ->
             storiesView.config.format =
                 if (isChecked) UiConfig.Format.FULLSCREEN else UiConfig.Format.FIXED
+        }
+
+        swServer.setOnCheckedChangeListener { _, isChecked ->
+            baseServer = if (isChecked) R.string.wistory_dev_url else R.string.wistory_base_url
+            applyStories()
         }
 
         swipeToRefresh.setOnRefreshListener {
@@ -58,13 +52,18 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
             } ?: let {
                 token = null
             }
+            serverUrl = getString(baseServer)
             config {
                 format = UiConfig.Format.FIXED
-                statusBarPosition = UiConfig.VerticalAlignment.BOTTOM
             }
             eventListener = this@MainActivity
         }
 
         swipeToRefresh.isRefreshing = false
+    }
+
+    override fun onError(e: Exception) {
+        super.onError(e)
+        Snackbar.make(swipeToRefresh, e.localizedMessage, LENGTH_SHORT).show()
     }
 }

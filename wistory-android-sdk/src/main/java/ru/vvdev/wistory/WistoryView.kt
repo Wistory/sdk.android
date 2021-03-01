@@ -37,7 +37,10 @@ class WistoryView @JvmOverloads constructor(
     }
 
     private fun recreate() {
-        eventListener?.let { WistoryCommunication.getInstance().addCallBackListener(it) }
+        eventListener?.let {
+            WistoryCommunication.getInstance().removeCallbackListener(it)
+            WistoryCommunication.getInstance().addCallBackListener(it)
+        }
         val fragmentManager: FragmentManager? =
             try {
                 FragmentManager.findFragment<Fragment>(this).childFragmentManager
@@ -45,16 +48,22 @@ class WistoryView @JvmOverloads constructor(
                 getFragmentManager(context)
             }
         try {
-            fragmentManager?.beginTransaction()?.replace(
-                R.id.fragmentContainerView,
-                WistoryListFragment.newInstance(
-                    token ?: Wistory.token,
-                    Wistory.serverUrl,
-                    registrationId,
-                    config
-                ),
-                WistoryListFragment::class.java.simpleName
-            )?.commit()
+            fragmentManager?.fragments
+            fragmentManager?.apply {
+                findFragmentByTag(WistoryListFragment::class.java.simpleName)?.let {
+                    WistoryCommunication.getInstance().removeCallbackListener(it as WistoryListFragment)
+                }
+                beginTransaction().replace(
+                        R.id.fragmentContainerView,
+                        WistoryListFragment.newInstance(
+                            token ?: Wistory.token,
+                            serverUrl ?: Wistory.serverUrl,
+                            registrationId,
+                            config
+                        ),
+                        WistoryListFragment::class.java.simpleName
+                    ).commit()
+            }
         } catch (e: Exception) {
             e
         }
@@ -71,8 +80,10 @@ class WistoryView @JvmOverloads constructor(
     override fun requestLayout() {
         super.requestLayout()
         post {
-            measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
+            measure(
+                MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
+            )
             layout(left, top, right, bottom)
         }
     }

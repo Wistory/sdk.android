@@ -6,11 +6,14 @@ import ru.vvdev.wistory.UiConfig
 internal class SnapModel(
     val textBlock: TextModel?,
     var statusbar: ProgressbarModel?,
-    val image: String,
+    val image: String?,
+    val video: String?,
+    val gif: String?,
     var enableGradient: Boolean,
     val button: ButtonModel?,
     val duration: String,
     private var theme: String,
+    val soundVideo: Boolean?,
     var vote: StoryVotingModel? = null
 ) : Serializable {
 
@@ -27,4 +30,11 @@ internal class SnapModel(
             else
                 "light"
         }
+
+
+    fun getContentResource() = when {
+        !video.isNullOrBlank() -> video
+        !gif.isNullOrBlank() -> gif
+        else -> image
+    }
 }
