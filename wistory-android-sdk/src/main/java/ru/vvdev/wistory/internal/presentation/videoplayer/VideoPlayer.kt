@@ -151,10 +151,10 @@ internal class VideoPlayer(
     }
 
     interface VideoPlayerCallBack {
-        fun videoBuffering(playWhenReady: Boolean)
-        fun videoEnd(playWhenReady: Boolean)
-        fun videoIdle(playWhenReady: Boolean)
-        fun videoReady(playWhenReady: Boolean)
+        fun videoBuffering(playWhenReady: Boolean) {}
+        fun videoEnd(playWhenReady: Boolean) {}
+        fun videoIdle(playWhenReady: Boolean) {}
+        fun videoReady(playWhenReady: Boolean) {}
     }
 
     private fun log(massage: String) {

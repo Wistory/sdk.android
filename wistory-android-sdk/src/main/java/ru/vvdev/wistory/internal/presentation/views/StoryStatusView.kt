@@ -124,6 +124,10 @@ internal class StoryStatusView : LinearLayout {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     fun pause() {
         if (isComplete) return
+        if (isSkip) {
+            isSkip = false
+            return
+        }
         val p = progressBars[current]
         p.progress = p.progress
         animators[current].pause()
