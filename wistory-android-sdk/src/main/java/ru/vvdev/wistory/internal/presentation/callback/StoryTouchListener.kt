@@ -2,20 +2,21 @@ package ru.vvdev.wistory.internal.presentation.callback
 
 import android.content.Context
 import android.os.Handler
+import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.view.GestureDetectorCompat
-import kotlin.math.abs
 import ru.vvdev.wistory.R
+import kotlin.math.abs
 
 open class StoryTouchListener(context: Context) : View.OnTouchListener {
 
-    private val SWIPE_DISTANCE_THRESHOLD = 100
-    private val SWIPE_VELOCITY_THRESHOLD = 100
-
-    private val MAX_CLICK_DURATION = 500L
-    private var startClickTime: Long = 0
+    companion object {
+        private const val SWIPE_DISTANCE_THRESHOLD = 100
+        private const val SWIPE_VELOCITY_THRESHOLD = 100
+        private const val MAX_CLICK_DURATION = 500L
+    }
 
     private val gestureDetector: GestureDetectorCompat
 
@@ -36,26 +37,27 @@ open class StoryTouchListener(context: Context) : View.OnTouchListener {
     open fun onResume() = false
 
     private val resumeHandler = Handler()
-    private val resumeRunnable = Runnable {
-        onResume()
-    }
+    private val stopHandler = Handler()
+    private val resumeRunnable = Runnable { onResume() }
+    private val stopRunnable = Runnable { onCLickStop() }
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
+        Log.i("TouchEvent", event.toString())
         if (gestureDetector.onTouchEvent(event)) {
+            stopHandler.removeCallbacksAndMessages(null)
             if (v.id == R.id.skip) {
                 onCLickRight()
             } else if (v.id == R.id.reverse) {
                 onCLickLeft()
             }
-        } /*else {
+        } else
             if (event.action == MotionEvent.ACTION_DOWN || event.action == MotionEvent.ACTION_MOVE) {
-                onCLickStop()
+                stopHandler.postDelayed(stopRunnable, 500)
                 resumeHandler.removeCallbacksAndMessages(null)
             } else {
                 resumeHandler.postDelayed(resumeRunnable, MAX_CLICK_DURATION)
             }
-            return true
-        }*/
+
         return true
     }
 
@@ -75,6 +77,7 @@ open class StoryTouchListener(context: Context) : View.OnTouchListener {
             try {
                 val diffY = e2.y - e1.y
                 val diffX = e2.x - e1.x
+
 
                 if (abs(diffY) > SWIPE_DISTANCE_THRESHOLD && abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
                     if (abs(diffX) < 100)
