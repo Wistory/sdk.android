@@ -99,6 +99,10 @@ internal class VideoPlayer(
         player?.playWhenReady = false
     }
 
+    fun setVolume(value: Float) {
+        player?.volume = value
+    }
+
     fun destroy() {
         log("destroy")
         player?.playWhenReady = false

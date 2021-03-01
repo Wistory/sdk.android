@@ -13,6 +13,7 @@ internal class SnapModel(
     val button: ButtonModel?,
     val duration: String,
     private var theme: String,
+    val soundVideo: Boolean?,
     var vote: StoryVotingModel? = null
 ) : Serializable {
 

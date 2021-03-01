@@ -49,7 +49,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
-
+          
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/wrapper"
                 android:layout_width="match_parent"
@@ -59,7 +59,7 @@
                     android:id="@+id/image"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginBottom="2dp"/>
+                    android:layout_marginBottom="2dp" />
 
                 <com.google.android.exoplayer2.ui.PlayerView
                     android:id="@+id/mPlayerView"
@@ -88,7 +88,6 @@
                         app:layout_constraintBottom_toBottomOf="parent"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
         </androidx.cardview.widget.CardView>
 
 
@@ -192,28 +191,52 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <FrameLayout
-            android:id="@+id/llClose"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:translationZ="1dp"
+
+        <ImageView
+            android:id="@+id/headerAvatar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintBottom_toBottomOf="@+id/close"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/storiesStatus">
+            app:layout_constraintTop_toTopOf="@id/close" />
 
-            <ImageView
-                android:id="@+id/close"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginTop="10dp"
-                android:contentDescription="@null"
-                android:paddingLeft="4dp"
-                android:paddingTop="10dp"
-                android:paddingRight="20dp"
-                android:paddingBottom="10dp"
-                android:src="@drawable/wistory_ic_close"
-                android:tint="#fff" />
-        </FrameLayout>
+        <TextView
+            android:id="@+id/tvStoryHeader"
+            android:layout_width="255dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="9dp"
+            android:textSize="14sp"
+            app:layout_constraintStart_toEndOf="@id/headerAvatar"
+            app:layout_constraintTop_toTopOf="@id/headerAvatar" />
 
+
+        <ImageView
+            android:id="@+id/sound"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:src="@drawable/ic_sound_on_white"
+            app:layout_constraintBottom_toBottomOf="@id/close"
+            app:layout_constraintEnd_toStartOf="@id/close"
+            app:layout_constraintTop_toTopOf="@id/close" />
+
+        <ImageView
+            android:id="@+id/close"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@null"
+            android:paddingStart="12dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="10dp"
+            android:src="@drawable/wistory_ic_close"
+            android:tint="#fff"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/storiesStatus" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
@@ -238,8 +261,8 @@
             android:layout_height="28dp"
             android:layout_marginRight="16dp"
             android:padding="2dp"
-            android:src="@drawable/wistory_ic_not_like"/>
-      
+            android:src="@drawable/wistory_ic_not_like" />
+
         <ImageView
             android:id="@+id/dislike"
             android:layout_width="28dp"
@@ -247,15 +270,15 @@
             android:layout_marginRight="16dp"
 
             android:padding="2dp"
-            android:src="@drawable/wistory_ic_not_dislike"/>
+            android:src="@drawable/wistory_ic_not_dislike" />
 
         <ImageView
             android:id="@+id/favorite"
-            android:layout_gravity="right"
             android:layout_width="28dp"
             android:layout_height="28dp"
+            android:layout_gravity="right"
             android:padding="2dp"
-            android:src="@drawable/wistory_ic_not_favorite"/>
+            android:src="@drawable/wistory_ic_not_favorite" />
 
         <FrameLayout
             android:layout_width="0dp"
@@ -264,11 +287,11 @@
 
             <ImageView
                 android:id="@+id/share"
-                android:layout_gravity="right"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
+                android:layout_gravity="right"
                 android:padding="2dp"
-                android:src="@drawable/wistory_ic_share"/>
+                android:src="@drawable/wistory_ic_share" />
 
         </FrameLayout>
 
