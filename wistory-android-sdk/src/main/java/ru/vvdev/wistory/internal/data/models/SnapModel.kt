@@ -32,8 +32,8 @@ internal class SnapModel(
 
 
     fun getContentResource() = when {
-        !video.isNullOrEmpty() -> video
-        !gif.isNullOrEmpty() -> gif
+        !video.isNullOrBlank() -> video
+        !gif.isNullOrBlank() -> gif
         else -> image
     }
 }

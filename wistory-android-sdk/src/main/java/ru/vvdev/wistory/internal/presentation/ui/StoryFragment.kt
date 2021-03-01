@@ -252,7 +252,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         dislike.imageTintList = color
         favorite.imageTintList = color
         share.imageTintList = color
-        setupBottomButtons(story, color)
+        setupBottomButtons(story)
     }
 
     private fun setValues(story: Story, uiConfig: UiConfig) {
@@ -285,7 +285,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         }
     }
 
-    private fun setupBottomButtons(story: Story, color: ColorStateList) {
+    private fun setupBottomButtons(story: Story) {
 
         val position: Int = arguments?.getSerializable(ARG_STORY_POSITION) as Int
 
@@ -364,6 +364,8 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         typeStory = TypeStory.VIDEO_TYPE
         imageProgressBar.visibility = View.VISIBLE
         setVideoVisible()
+        videoPlayer?.destroy()
+        videoPlayer?.releasePlayer()
         videoPlayer?.initializePlayer(content)
     }
 
@@ -740,12 +742,6 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         VIDEO_TYPE, IMAGE_TYPE
     }
 
-    override fun videoBuffering(playWhenReady: Boolean) {}
-
-    override fun videoEnd(playWhenReady: Boolean) {}
-
-    override fun videoIdle(playWhenReady: Boolean) {}
-
     override fun videoReady(playWhenReady: Boolean) {
 
         if (isFragmentEnabled && !storyPlayAgain) {
@@ -779,13 +775,12 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         super.onPause()
         storiesStatus?.destroy()
         videoPlayer?.destroy()
-        if (Util.SDK_INT <= 23) videoPlayer?.releasePlayer()
+        videoPlayer?.releasePlayer()
     }
 
     override fun onStop() {
         super.onStop()
-
-        if (Util.SDK_INT > 23) videoPlayer?.releasePlayer()
+        videoPlayer?.releasePlayer()
         videoPlayer = null
     }
 
