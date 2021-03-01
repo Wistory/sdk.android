@@ -113,7 +113,10 @@ internal class WistoryListFragment : Fragment(), StoryEventListener,
             viewModel.clearUpdated()
         }
         viewModel.errorLiveData.sub {
-            postException(it)
+            it?.let {
+                postException(it)
+                viewModel.errorLiveData.setValue(null)
+            }
         }
     }
 

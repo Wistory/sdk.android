@@ -297,7 +297,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
             videoPlayer?.releasePlayer()
 
-            getContentResource().let {
+            getContentResource()?.let {
                 if (it.contains(".mp4")) {
                     setVideoContent(it)
                     setVolume(this.soundVideo)
@@ -519,7 +519,9 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         storyFragmentCallback?.storyEvent(StoryNextEvent(story))
 
         for (s in story.content) {
-            statusResources.add(s.getContentResource())
+            s.getContentResource()?.let {
+                statusResources.add(it)
+            }
         }
 
         var arr = ArrayList<Long>()
@@ -892,9 +894,11 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
         var storyHaveVideo = false
         val story = requireArguments().getSerializable(ARG_STORY) as Story
-        story.content.map {
-            if (it.video?.contains(".mp4") == true) {
-                storyHaveVideo = true
+
+        story.content.map { snapModel ->
+            snapModel.getContentResource()?.let {
+                if (it.contains(".mp4"))
+                    storyHaveVideo = true
             }
         }
         if (storyHaveVideo) {
