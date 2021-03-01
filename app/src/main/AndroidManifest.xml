@@ -28,7 +28,7 @@
 
         <meta-data
             android:name="WISTORY_TOKEN"
-            android:value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDJkMDdhYzI2NTA0YjU5MGY2NDFlZDIiLCJpYXQiOjE2MTM1NjM4MjF9._ofLioNsUc2Tj_rfRXZnHbYYk2zL_3gYwWfdmidTRIw" />
+            android:value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZWRmYzI0NTRlMmRiYjZlZGVjNzU0ZWUiLCJpYXQiOjE2MDI1MDc5MDF9.yF8RpLlpIE9DysGbb7EADN6mqRR3UepS0yj_yNTTQSo" />
 
       </application>
 
