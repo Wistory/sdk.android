@@ -13,7 +13,7 @@ import ru.vvdev.wistory.internal.presentation.callback.StoryEventListener
 
 class MainActivity : AppCompatActivity(), StoryEventListener {
 
-    private var baseServer: Int = R.string.wistory_dev_url
+    private var baseServer: Int = R.string.wistory_base_url
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -47,8 +47,7 @@ open class StoryTouchListener(context: Context) : View.OnTouchListener {
             } else if (v.id == R.id.reverse) {
                 onCLickLeft()
             }
-            return true
-        } else {
+        } /*else {
             if (event.action == MotionEvent.ACTION_DOWN || event.action == MotionEvent.ACTION_MOVE) {
                 onCLickStop()
                 resumeHandler.removeCallbacksAndMessages(null)
@@ -56,7 +55,8 @@ open class StoryTouchListener(context: Context) : View.OnTouchListener {
                 resumeHandler.postDelayed(resumeRunnable, MAX_CLICK_DURATION)
             }
             return true
-        }
+        }*/
+        return true
     }
 
     private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {

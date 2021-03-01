@@ -364,6 +364,8 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         typeStory = TypeStory.VIDEO_TYPE
         imageProgressBar.visibility = View.VISIBLE
         setVideoVisible()
+        videoPlayer?.destroy()
+        videoPlayer?.releasePlayer()
         videoPlayer?.initializePlayer(content)
     }
 
@@ -773,13 +775,12 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         super.onPause()
         storiesStatus?.destroy()
         videoPlayer?.destroy()
-        if (Util.SDK_INT <= 23) videoPlayer?.releasePlayer()
+        videoPlayer?.releasePlayer()
     }
 
     override fun onStop() {
         super.onStop()
-
-        if (Util.SDK_INT > 23) videoPlayer?.releasePlayer()
+        videoPlayer?.releasePlayer()
         videoPlayer = null
     }
 

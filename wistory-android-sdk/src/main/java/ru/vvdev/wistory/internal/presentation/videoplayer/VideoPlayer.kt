@@ -5,16 +5,12 @@ import android.content.Context
 import android.graphics.Color
 import android.net.Uri
 import android.util.Log
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.DefaultLoadControl
+import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DefaultAllocator
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.android.exoplayer2.video.VideoListener
@@ -34,9 +30,6 @@ internal class VideoPlayer(
 
     private var player: SimpleExoPlayer? = null
     private lateinit var mediaDataSourceFactory: DataSource.Factory
-
-    private var trackSelector: DefaultTrackSelector? = null
-    private val videoTrackSelectionFactory = AdaptiveTrackSelection.Factory()
     private var currentWindow: Int = 0
     private var playbackPosition: Long = 0
 
@@ -61,26 +54,22 @@ internal class VideoPlayer(
     }
 
     fun initializePlayer(uri: String) {
-        val allocator = DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE)
-        val loadControl = DefaultLoadControl(allocator, 360000, 600000, 2500, 5000, -1, true)
-        trackSelector = DefaultTrackSelector(context, videoTrackSelectionFactory)
         mediaDataSourceFactory =
             DefaultDataSourceFactory(
                 context,
                 Util.getUserAgent(context, Wistory::class.java.simpleName)
             )
-        trackSelector?.let {
-            player =
-                SimpleExoPlayer.Builder(context).setTrackSelector(it).setLoadControl(loadControl)
-                    .build()
-        }
-        log("initializePlayer")
+
 
         val mediaSource = ProgressiveMediaSource.Factory(mediaDataSourceFactory)
-            .createMediaSource(Uri.parse(uri))
+            .createMediaSource(MediaItem.fromUri(uri))
+        player = SimpleExoPlayer.Builder(context).build()
+
+        log("initializePlayer")
 
         player?.apply {
-            prepare(mediaSource, true, true)
+            setMediaSource(mediaSource)
+            prepare()
             playWhenReady = true
             addListener(this@VideoPlayer)
         }
@@ -94,8 +83,8 @@ internal class VideoPlayer(
         log("releasePlayer")
         updateStartPosition()
         player?.clearVideoSurface()
+        player?.release()
         mPlayerView.foreground = context.resources.getDrawable(R.color.wistory_black)
-        trackSelector = null
     }
 
     fun isPlaying(): Boolean {
@@ -120,7 +109,6 @@ internal class VideoPlayer(
 
     fun play() {
         log("play")
-
         player?.playWhenReady = true
     }
 
