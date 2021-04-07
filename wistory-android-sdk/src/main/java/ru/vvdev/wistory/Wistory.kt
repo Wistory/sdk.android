@@ -21,7 +21,7 @@ object Wistory {
         this.applicationContext = application.applicationContext
     }
 
-    fun showStory(context: Context): StoryView {
+    fun getStoryView(context: Context): StoryView {
         return StoryView(context)
     }
 

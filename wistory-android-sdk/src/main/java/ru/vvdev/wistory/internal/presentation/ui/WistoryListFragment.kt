@@ -48,19 +48,26 @@ internal open class WistoryListFragment : AbstractWistoryFragment(),
         }
     }
 
+    override fun initWistoryParams(arguments: Bundle?) {
+        token = arguments?.getString(TOKEN) ?: ""
+        serverUrl = arguments?.getString(SERVER_URL) ?: ""
+        registrationId = arguments?.getString(REGISTRATION_ID)
+        config = arguments?.getSerializable(CONFIG) as UiConfig
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        initWistoryParams(arguments)
         return inflater.inflate(R.layout.wistory_list_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         initListener()
-        initApiService(arguments)
+        initApiService()
         initAdapter()
 
         viewModel = ViewModelProviders.of(requireActivity(), ViewModelFactory(StoriesRepository()))

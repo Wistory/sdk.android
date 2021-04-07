@@ -20,7 +20,6 @@ import ru.vvdev.wistory.internal.presentation.viewmodel.WistoryViewModel
 internal class WistorySoaringFragment : AbstractWistoryFragment() {
 
     companion object {
-
         private const val EVENT_ID = "EVENT_ID"
 
         fun newInstance(
@@ -43,25 +42,35 @@ internal class WistorySoaringFragment : AbstractWistoryFragment() {
         }
     }
 
+    private var eventId: Int? = null
+
+    override fun initWistoryParams(arguments: Bundle?) {
+        token = arguments?.getString(TOKEN) ?: ""
+        serverUrl = arguments?.getString(SERVER_URL) ?: ""
+        registrationId = arguments?.getString(REGISTRATION_ID)
+        config = arguments?.getSerializable(CONFIG) as UiConfig
+        eventId = arguments.getInt(EVENT_ID)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.wistory_wrap_story, container, false)
+    ): View {
+        initWistoryParams(arguments)
+        return View(context)
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initListener()
-        initApiService(arguments)
+        initApiService()
 
         viewModel = ViewModelProviders.of(this, ViewModelFactory(StoriesRepository()))
             .get(WistoryViewModel::class.java)
 
-        viewModel.register(arguments?.getInt(EVENT_ID))
+        eventId?.apply { viewModel.register(this) }
 
         viewModel.storyItems.sub { list ->
             list?.let {

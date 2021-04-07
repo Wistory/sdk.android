@@ -28,7 +28,10 @@ internal abstract class AbstractWistoryFragment : Fragment(), StoryEventListener
     internal var registrationId: String? = null
     internal lateinit var viewModel: WistoryViewModel
 
+    abstract fun initWistoryParams(arguments: Bundle?)
+
     internal fun navigateToStory(position: Int) {
+        config
         requireActivity().startActivity(Intent(activity, StoryActivity::class.java).apply {
             putExtra(StoryActivity.ARG_TYPE, StoryActivity.TYPE_STORIES)
             putExtra(StoryActivity.ARG_STORIES, viewModel.storyItems.value?.toTypedArray())
@@ -37,13 +40,7 @@ internal abstract class AbstractWistoryFragment : Fragment(), StoryEventListener
         })
     }
 
-    internal fun initApiService(arguments: Bundle?) {
-
-        token = arguments?.getString(TOKEN) ?: ""
-        serverUrl = arguments?.getString(SERVER_URL) ?: ""
-        registrationId = arguments?.getString(REGISTRATION_ID)
-        config = arguments?.getSerializable(CONFIG) as UiConfig
-
+    internal fun initApiService() {
         try {
             StoriesApi.createService(
                 requireContext(),

@@ -13,16 +13,14 @@ import java.lang.reflect.Executable
 
 class StoryView(mContext: Context) : View(mContext) {
 
-    var eventListener: StoryEventListener? = null
-    var serverUrl: String? = null
-    var token: String? = null
-    var registrationId: String? = null
-    var config: UiConfig = UiConfig()
-    var eventId: Int? = null
-        set(value) = createStory(value)
-
-
-    private fun createStory(eventId: Int?) {
+    fun initStory(
+        eventId: Int? = null,
+        eventListener: StoryEventListener? = null,
+        serverUrl: String? = null,
+        token: String? = null,
+        config: UiConfig? = UiConfig(),
+        registrationId: String? = null
+    ) {
         try {
             eventListener?.let {
                 WistoryCommunication.getInstance().removeCallbackListener(it)
