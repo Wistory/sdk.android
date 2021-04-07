@@ -21,6 +21,10 @@ object Wistory {
         this.applicationContext = application.applicationContext
     }
 
+    fun showStory(context: Context): StoryView {
+        return StoryView(context)
+    }
+
     val token: String?
         get() {
             return app.metaData.getString("WISTORY_TOKEN")

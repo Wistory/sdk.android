@@ -33,7 +33,7 @@
                     android:id="@+id/storiesView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:clipToPadding="false"/>
+                    android:clipToPadding="false" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -85,6 +85,46 @@
 
                         </LinearLayout>
 
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/tilEventId"
+                                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                                android:layout_width="match_parent"
+                                android:layout_height="50dp"
+                                android:layout_marginTop="2dp"
+                                android:layout_weight="1"
+                                android:hint="eventId"
+                                android:paddingStart="16dp"
+                                android:paddingEnd="16dp"
+                                app:boxStrokeColor="@color/wistory_black">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/etEventId"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:imeOptions="actionNext"
+                                    android:inputType="textCapSentences|textPersonName"
+                                    android:textSize="12sp" />
+
+                            </com.google.android.material.textfield.TextInputLayout>
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnShow"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="56dp"
+                                android:layout_marginEnd="16dp"
+                                android:text="Применить"
+                                android:textColor="@color/wistory_black"
+                                android:textSize="12sp"
+                                app:strokeColor="@color/wistory_black" />
+
+                        </LinearLayout>
+
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -116,6 +156,7 @@
                             android:checked="false"
                             android:text="Дебаг" />
                     </LinearLayout>
+
                 </RelativeLayout>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>

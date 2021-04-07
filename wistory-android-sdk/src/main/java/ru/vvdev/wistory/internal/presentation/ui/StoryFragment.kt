@@ -24,7 +24,6 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.DrawableImageViewTarget
 import com.bumptech.glide.request.target.Target
-import com.google.android.exoplayer2.util.Util
 import kotlinx.android.synthetic.main.wistory_fragment.*
 import ru.vvdev.wistory.R
 import ru.vvdev.wistory.UiConfig
@@ -110,7 +109,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         close.setOnClickListener {
             requireActivity().finish()
         }
-
+        retainInstance
         val touchListener = object : StoryTouchListener(requireContext()) {
 
             override fun onCLickLeft(): Boolean {

@@ -1,14 +1,14 @@
 package ru.vvdev.storiesdemo
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT
 import com.google.android.material.snackbar.Snackbar
 import java.lang.Exception
 import kotlinx.android.synthetic.main.activity_main.*
+import ru.vvdev.wistory.StoryView
 import ru.vvdev.wistory.UiConfig
+import ru.vvdev.wistory.Wistory
 import ru.vvdev.wistory.internal.presentation.callback.StoryEventListener
 
 class MainActivity : AppCompatActivity(), StoryEventListener {
@@ -39,6 +39,20 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
 
         btnApply.setOnClickListener {
             applyStories()
+        }
+
+        btnShow.setOnClickListener {
+            Wistory.showStory(this).apply {
+                eventId = 15
+                token =
+                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmM3NjJjYTFmZTcwMzc4MDg0ZmNjMzgiLCJpYXQiOjE2MDY5MDI0NzR9.oX3IXdwucxb73DCkNJVGhvYN1n4Zs5WddzEI8yiKtwE"
+
+                serverUrl = getString(baseServer)
+                config {
+                    format = UiConfig.Format.FIXED
+                }
+                eventListener = this@MainActivity
+            }
         }
 
         applyStories()

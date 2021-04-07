@@ -5,9 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,13 +12,10 @@ import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.items.IFlexible
 import kotlinx.android.synthetic.main.wistory_list_fragment.*
 import ru.vvdev.wistory.R
-import ru.vvdev.wistory.ServerConfig
 import ru.vvdev.wistory.UiConfig
 import ru.vvdev.wistory.internal.data.models.Story
-import ru.vvdev.wistory.internal.data.network.StoriesApi
 import ru.vvdev.wistory.internal.data.repository.StoriesRepository
 import ru.vvdev.wistory.internal.domain.events.*
-import ru.vvdev.wistory.internal.presentation.callback.StoryEventListener
 import ru.vvdev.wistory.internal.presentation.callback.WistoryCommunication
 import ru.vvdev.wistory.internal.presentation.items.FavoriteStoryItem
 import ru.vvdev.wistory.internal.presentation.items.PlaceholderStoryItem
@@ -29,23 +23,13 @@ import ru.vvdev.wistory.internal.presentation.items.ReadedStoryItem
 import ru.vvdev.wistory.internal.presentation.items.StoryItem
 import ru.vvdev.wistory.internal.presentation.viewmodel.WistoryViewModel
 
-internal class WistoryListFragment : Fragment(), StoryEventListener,
+internal open class WistoryListFragment : AbstractWistoryFragment(),
     StoryItem.OnStoryClickListener {
 
     private var flexAdapter = FlexibleAdapter<IFlexible<*>>(listOf())
-    private lateinit var viewModel: WistoryViewModel
-    private var config: UiConfig? = null
-    private var token: String? = null
-    private var serverUrl: String? = null
-    private var registrationId: String? = null
     private var favoriteStoryItem: FavoriteStoryItem? = null
 
     companion object {
-        private const val TOKEN = "token"
-        private const val CONFIG = "config"
-        private const val SERVER_URL = "serverUrl"
-        private const val REGISTRATION_ID = "registrationId"
-
         fun newInstance(
             token: String?,
             serverUrl: String?,
@@ -74,13 +58,9 @@ internal class WistoryListFragment : Fragment(), StoryEventListener,
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        token = arguments?.getString(TOKEN) ?: ""
-        serverUrl = arguments?.getString(SERVER_URL) ?: ""
-        registrationId = arguments?.getString(REGISTRATION_ID)
-        config = arguments?.getSerializable(CONFIG) as UiConfig
 
         initListener()
-        initApiService()
+        initApiService(arguments)
         initAdapter()
 
         viewModel = ViewModelProviders.of(requireActivity(), ViewModelFactory(StoriesRepository()))
@@ -124,15 +104,6 @@ internal class WistoryListFragment : Fragment(), StoryEventListener,
         viewModel.publishEvents()
     }
 
-    private fun navigateToStory(position: Int) {
-        requireActivity().startActivity(Intent(activity, StoryActivity::class.java).apply {
-            putExtra(StoryActivity.ARG_TYPE, StoryActivity.TYPE_STORIES)
-            putExtra(StoryActivity.ARG_STORIES, viewModel.storyItems.value?.toTypedArray())
-            putExtra(StoryActivity.ARG_POSITION, position)
-            putExtra(StoryActivity.ARG_SETTINGS, config)
-        })
-    }
-
     private fun navigateToFavoriteList() {
         requireActivity().startActivity(Intent(activity, StoryActivity::class.java).apply {
             putExtra(StoryActivity.ARG_TYPE, StoryActivity.TYPE_FAVORITES)
@@ -156,22 +127,6 @@ internal class WistoryListFragment : Fragment(), StoryEventListener,
                     addItem(PlaceholderStoryItem())
             }
         }
-    }
-
-    private fun initApiService() {
-        try {
-            StoriesApi.createService(
-                requireContext(),
-                ServerConfig(token, serverUrl, registrationId)
-            )
-        } catch (e: Exception) {
-            postException(e)
-        }
-    }
-
-    private fun initListener() {
-        WistoryCommunication.getInstance().removeCallbackListener(this)
-        WistoryCommunication.getInstance().addCallBackListener(this)
     }
 
     private fun setItems(list: ArrayList<Story>) {
@@ -280,10 +235,6 @@ internal class WistoryListFragment : Fragment(), StoryEventListener,
         return null
     }
 
-    private fun postException(e: Exception?) = e?.let {
-        WistoryCommunication.getInstance().handleEvent(ErrorEvent(e))
-    }
-
     private fun getStoryPositionById(id: String): Int? {
         viewModel.storyItems.value?.forEachIndexed { index, story ->
             if (story._id == id) {
@@ -316,9 +267,5 @@ internal class WistoryListFragment : Fragment(), StoryEventListener,
 
     override fun onFavoriteItemClick() {
         navigateToFavoriteList()
-    }
-
-    private fun <T> LiveData<T>.sub(func: (T?) -> Unit) {
-        observe(viewLifecycleOwner, Observer { T -> func.invoke(T) })
     }
 }
