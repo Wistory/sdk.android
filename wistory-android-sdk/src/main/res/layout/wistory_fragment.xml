@@ -49,7 +49,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
-          
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/wrapper"
                 android:layout_width="match_parent"
@@ -77,15 +77,15 @@
                     app:surface_type="texture_view"
                     app:use_controller="false" />
 
-                    <ImageView
-                        android:id="@+id/gradient"
-                        android:elevation="4dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        app:layout_constraintHeight_percent="0.2"
-                        android:layout_alignParentBottom="true"
-                        android:contentDescription="@null"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                <ImageView
+                    android:id="@+id/gradient"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_alignParentBottom="true"
+                    android:contentDescription="@null"
+                    android:elevation="4dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHeight_percent="0.2" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
@@ -216,10 +216,11 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:paddingStart="20dp"
-            android:paddingEnd="8dp"
             android:paddingTop="10dp"
+            android:paddingEnd="8dp"
             android:paddingBottom="10dp"
             android:src="@drawable/ic_sound_on_white"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/close"
             app:layout_constraintEnd_toStartOf="@id/close"
             app:layout_constraintTop_toTopOf="@id/close" />
