@@ -7,7 +7,6 @@ import com.google.android.material.snackbar.Snackbar
 import java.lang.Exception
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.vvdev.wistory.UiConfig
-import ru.vvdev.wistory.Wistory
 import ru.vvdev.wistory.internal.presentation.callback.StoryEventListener
 
 class MainActivity : AppCompatActivity(), StoryEventListener {
@@ -39,29 +38,34 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
         btnApply.setOnClickListener {
             applyStories()
         }
+
         btnShow.setOnClickListener {
-            Wistory.getStoryView(this).initStory(
-                token = etToken.text.takeIf { !it.isNullOrEmpty() }?.let {
-                    it.toString()
-                } ?: let {
-                    null
-                },
-                serverUrl = getString(baseServer),
-                config = UiConfig().apply { format = UiConfig.Format.FULLSCREEN },
-                eventListener = this@MainActivity,
-                eventId = etEventId.text.takeIf { !it.isNullOrEmpty() }?.let {
-                    it.toString().toInt()
-                } ?: let {
-                    null
-                }
-            )
+            supportFragmentManager.beginTransaction().add(R.id.container, StoryEventFragment())
+                .commit()
+
+            /*    val view = Wistory.singleStory(this)
+                 view {
+                     token = etToken.text.takeIf { !it.isNullOrEmpty() }?.let {
+                         it.toString()
+                     } ?: let {
+                         null
+                     }
+                     serverUrl = getString(baseServer)
+                     config = UiConfig().apply { format = UiConfig.Format.FULLSCREEN }
+                     eventListener = this@MainActivity
+                     eventId = etEventId.text.takeIf { !it.isNullOrEmpty() }?.let {
+                         it.toString().toInt()
+                     } ?: let {
+                         null
+                     }
+
+                 }*/
         }
 
         applyStories()
     }
 
     private fun applyStories() {
-
         storiesView {
             etToken.text.takeIf { !it.isNullOrEmpty() }?.let {
                 token = it.toString()
@@ -74,7 +78,6 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
             }
             eventListener = this@MainActivity
         }
-
         swipeToRefresh.isRefreshing = false
     }
 

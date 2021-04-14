@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import eu.davidea.flexibleadapter.FlexibleAdapter
@@ -14,14 +14,11 @@ import kotlinx.android.synthetic.main.wistory_list_fragment.*
 import ru.vvdev.wistory.R
 import ru.vvdev.wistory.UiConfig
 import ru.vvdev.wistory.internal.data.models.Story
-import ru.vvdev.wistory.internal.data.repository.StoriesRepository
 import ru.vvdev.wistory.internal.domain.events.*
-import ru.vvdev.wistory.internal.presentation.callback.WistoryCommunication
 import ru.vvdev.wistory.internal.presentation.items.FavoriteStoryItem
 import ru.vvdev.wistory.internal.presentation.items.PlaceholderStoryItem
 import ru.vvdev.wistory.internal.presentation.items.ReadedStoryItem
 import ru.vvdev.wistory.internal.presentation.items.StoryItem
-import ru.vvdev.wistory.internal.presentation.viewmodel.WistoryViewModel
 
 internal open class WistoryListFragment : AbstractWistoryFragment(),
     StoryItem.OnStoryClickListener {
@@ -48,6 +45,8 @@ internal open class WistoryListFragment : AbstractWistoryFragment(),
         }
     }
 
+    override fun currentFragment(): Fragment = this
+
     override fun initWistoryParams(arguments: Bundle?) {
         token = arguments?.getString(TOKEN) ?: ""
         serverUrl = arguments?.getString(SERVER_URL) ?: ""
@@ -66,14 +65,7 @@ internal open class WistoryListFragment : AbstractWistoryFragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initListener()
-        initApiService()
         initAdapter()
-
-        viewModel = ViewModelProviders.of(requireActivity(), ViewModelFactory(StoriesRepository()))
-            .get(WistoryViewModel::class.java)
-
-        viewModel.register()
 
         viewModel.storyItems.sub { list ->
             list?.let {
@@ -97,12 +89,6 @@ internal open class WistoryListFragment : AbstractWistoryFragment(),
                 }
             }
             viewModel.clearUpdated()
-        }
-        viewModel.errorLiveData.sub {
-            it?.let {
-                postException(it)
-                viewModel.errorLiveData.value = null
-            }
         }
     }
 

@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import kotlinx.android.synthetic.main.wistory_fragment.view.*
 
 object Wistory {
 
@@ -21,9 +20,7 @@ object Wistory {
         this.applicationContext = application.applicationContext
     }
 
-    fun getStoryView(context: Context): StoryView {
-        return StoryView(context)
-    }
+    fun singleStory(context: Context): SingleStory = SingleStory(context)
 
     val token: String?
         get() {
@@ -32,6 +29,6 @@ object Wistory {
 
     val serverUrl: String?
         get() {
-            return "${app.metaData.getString("WISTORY_SERVER_URL") ?: applicationContext.resources.getString(R.string.wistory_base_url)}api/"
+            return "${app.metaData.getString("WISTORY_SERVER_URL") ?: applicationContext.resources.getString(R.string.wistory_base_url)}"
         }
 }

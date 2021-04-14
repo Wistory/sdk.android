@@ -4,18 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProviders
-import ru.vvdev.wistory.R
-import ru.vvdev.wistory.ServerConfig
+import androidx.fragment.app.Fragment
 import ru.vvdev.wistory.UiConfig
-import ru.vvdev.wistory.internal.data.network.StoriesApi
-import ru.vvdev.wistory.internal.data.repository.StoriesRepository
-import ru.vvdev.wistory.internal.domain.events.UpdateOnFavoriteEvent
-import ru.vvdev.wistory.internal.domain.events.UpdateOnPollEvent
-import ru.vvdev.wistory.internal.domain.events.UpdateOnReadEvent
-import ru.vvdev.wistory.internal.domain.events.UpdateOnRelationEvent
-import ru.vvdev.wistory.internal.presentation.callback.WistoryCommunication
-import ru.vvdev.wistory.internal.presentation.viewmodel.WistoryViewModel
 
 internal class WistorySoaringFragment : AbstractWistoryFragment() {
 
@@ -42,7 +32,7 @@ internal class WistorySoaringFragment : AbstractWistoryFragment() {
         }
     }
 
-    private var eventId: Int? = null
+    override fun currentFragment(): Fragment = this
 
     override fun initWistoryParams(arguments: Bundle?) {
         token = arguments?.getString(TOKEN) ?: ""
@@ -61,32 +51,15 @@ internal class WistorySoaringFragment : AbstractWistoryFragment() {
         return View(context)
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initListener()
-        initApiService()
-
-        viewModel = ViewModelProviders.of(this, ViewModelFactory(StoriesRepository()))
-            .get(WistoryViewModel::class.java)
-
-        eventId?.apply { viewModel.register(this) }
-
         viewModel.storyItems.sub { list ->
             list?.let {
                 navigateToStory(0)
-                fragmentManager?.popBackStack()
-            }
-        }
-
-        viewModel.errorLiveData.sub {
-            it?.let {
-                postException(it)
-                viewModel.errorLiveData.value = null
+                parentFragmentManager.popBackStack()
             }
         }
     }
-
 
     override fun onPoll(storyId: String, sheet: Int, newpoll: String?, oldpoll: String?) {
         viewModel.onPoll(storyId, sheet, newpoll)

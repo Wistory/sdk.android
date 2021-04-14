@@ -2,12 +2,15 @@ package ru.vvdev.wistory.internal.presentation.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import ru.vvdev.wistory.ServerConfig
 import ru.vvdev.wistory.UiConfig
 import ru.vvdev.wistory.internal.data.network.StoriesApi
+import ru.vvdev.wistory.internal.data.repository.StoriesRepository
 import ru.vvdev.wistory.internal.domain.events.*
 import ru.vvdev.wistory.internal.presentation.callback.StoryEventListener
 import ru.vvdev.wistory.internal.presentation.callback.WistoryCommunication
@@ -26,12 +29,14 @@ internal abstract class AbstractWistoryFragment : Fragment(), StoryEventListener
     internal var token: String? = null
     internal var serverUrl: String? = null
     internal var registrationId: String? = null
+    internal var eventId: Int? = null
+
     internal lateinit var viewModel: WistoryViewModel
 
+    abstract fun currentFragment(): Fragment
     abstract fun initWistoryParams(arguments: Bundle?)
 
     internal fun navigateToStory(position: Int) {
-        config
         requireActivity().startActivity(Intent(activity, StoryActivity::class.java).apply {
             putExtra(StoryActivity.ARG_TYPE, StoryActivity.TYPE_STORIES)
             putExtra(StoryActivity.ARG_STORIES, viewModel.storyItems.value?.toTypedArray())
@@ -40,7 +45,22 @@ internal abstract class AbstractWistoryFragment : Fragment(), StoryEventListener
         })
     }
 
-    internal fun initApiService() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initListener()
+        initApiService()
+        viewModel = ViewModelProviders.of(currentFragment(), ViewModelFactory(StoriesRepository()))
+            .get(WistoryViewModel::class.java)
+        viewModel.register(eventId)
+        viewModel.errorLiveData.sub {
+            it?.let {
+                postException(it)
+                viewModel.errorLiveData.value = null
+            }
+        }
+    }
+
+    private fun initApiService() {
         try {
             StoriesApi.createService(
                 requireContext(),
@@ -51,12 +71,12 @@ internal abstract class AbstractWistoryFragment : Fragment(), StoryEventListener
         }
     }
 
-    internal fun initListener() {
+    private fun initListener() {
         WistoryCommunication.getInstance().removeCallbackListener(this)
         WistoryCommunication.getInstance().addCallBackListener(this)
     }
 
-    internal fun postException(e: Exception?) = e?.let {
+    private fun postException(e: Exception?) = e?.let {
         WistoryCommunication.getInstance().handleEvent(ErrorEvent(e))
     }
 
