@@ -1,8 +1,6 @@
 package ru.vvdev.storiesdemo
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT
 import com.google.android.material.snackbar.Snackbar
@@ -41,11 +39,33 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
             applyStories()
         }
 
+        btnShow.setOnClickListener {
+            supportFragmentManager.beginTransaction().add(R.id.container, StoryEventFragment())
+                .commit()
+
+            /*    val view = Wistory.singleStory(this)
+                 view {
+                     token = etToken.text.takeIf { !it.isNullOrEmpty() }?.let {
+                         it.toString()
+                     } ?: let {
+                         null
+                     }
+                     serverUrl = getString(baseServer)
+                     config = UiConfig().apply { format = UiConfig.Format.FULLSCREEN }
+                     eventListener = this@MainActivity
+                     eventId = etEventId.text.takeIf { !it.isNullOrEmpty() }?.let {
+                         it.toString().toInt()
+                     } ?: let {
+                         null
+                     }
+
+                 }*/
+        }
+
         applyStories()
     }
 
     private fun applyStories() {
-
         storiesView {
             etToken.text.takeIf { !it.isNullOrEmpty() }?.let {
                 token = it.toString()
@@ -58,7 +78,6 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
             }
             eventListener = this@MainActivity
         }
-
         swipeToRefresh.isRefreshing = false
     }
 

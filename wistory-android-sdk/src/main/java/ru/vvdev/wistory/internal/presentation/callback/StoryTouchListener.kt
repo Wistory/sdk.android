@@ -7,8 +7,8 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.view.GestureDetectorCompat
-import ru.vvdev.wistory.R
 import kotlin.math.abs
+import ru.vvdev.wistory.R
 
 open class StoryTouchListener(context: Context) : View.OnTouchListener {
 
@@ -50,8 +50,7 @@ open class StoryTouchListener(context: Context) : View.OnTouchListener {
             } else if (v.id == R.id.reverse) {
                 onCLickLeft()
             }
-        } else
-            if (event.action == MotionEvent.ACTION_DOWN || event.action == MotionEvent.ACTION_MOVE) {
+        } else if (event.action == MotionEvent.ACTION_DOWN || event.action == MotionEvent.ACTION_MOVE) {
                 stopHandler.postDelayed(stopRunnable, 500)
                 resumeHandler.removeCallbacksAndMessages(null)
             } else {
@@ -77,7 +76,6 @@ open class StoryTouchListener(context: Context) : View.OnTouchListener {
             try {
                 val diffY = e2.y - e1.y
                 val diffX = e2.x - e1.x
-
 
                 if (abs(diffY) > SWIPE_DISTANCE_THRESHOLD && abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
                     if (abs(diffX) < 100)

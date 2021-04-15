@@ -27,27 +27,29 @@ internal class WistoryViewModel(private val storiesRepository: StoriesRepository
         favoriteStoryItems.value = arrayListOf()
     }
 
-    fun register() {
+    fun register(eventId: Int? = null) {
         viewModelScope.launch {
             try {
                 when (storiesRepository.register()) {
-                    is RegisterResponse -> storyItems.value.run { getItems() }
+                    is RegisterResponse -> storyItems.value.run { getItems(eventId) }
                 }
             } catch (e: Exception) {
                 errorLiveData.setValue(e)
-                storyItems.value.run { getItems() }
+                storyItems.value.run { getItems(eventId) }
             }
         }
     }
 
-    private fun getItems() {
+    private fun getItems(eventId: Int?) {
         viewModelScope.launch {
             try {
-                val list = storiesRepository.getStories()
-                list?.let {
-                    storyItems.value = list
-                    getFavoriteItems()
-                }
+                val list: ArrayList<Story>? =
+                    if (eventId == null) storiesRepository.getStories()?.apply {
+                        storyItems.value = this
+                        getFavoriteItems()
+                    }
+                    else storiesRepository.getByEventId(eventId)?.stories
+                storyItems.value = list
             } catch (e: Exception) {
                 errorLiveData.value = e
             }

@@ -3,7 +3,6 @@ package ru.vvdev.wistory.internal.presentation.videoplayer
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
-import android.net.Uri
 import android.util.Log
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -16,7 +15,6 @@ import com.google.android.exoplayer2.util.Util
 import com.google.android.exoplayer2.video.VideoListener
 import ru.vvdev.wistory.R
 import ru.vvdev.wistory.Wistory
-
 
 @Suppress("IMPLICIT_BOXING_IN_IDENTITY_EQUALS")
 internal class VideoPlayer(
@@ -59,7 +57,6 @@ internal class VideoPlayer(
                 context,
                 Util.getUserAgent(context, Wistory::class.java.simpleName)
             )
-
 
         val mediaSource = ProgressiveMediaSource.Factory(mediaDataSourceFactory)
             .createMediaSource(MediaItem.fromUri(uri))
