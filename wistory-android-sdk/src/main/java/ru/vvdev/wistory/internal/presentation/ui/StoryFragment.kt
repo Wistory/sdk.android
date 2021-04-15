@@ -24,7 +24,6 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.DrawableImageViewTarget
 import com.bumptech.glide.request.target.Target
-import com.google.android.exoplayer2.util.Util
 import kotlinx.android.synthetic.main.wistory_fragment.*
 import ru.vvdev.wistory.R
 import ru.vvdev.wistory.UiConfig
@@ -110,7 +109,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         close.setOnClickListener {
             requireActivity().finish()
         }
-
+        retainInstance
         val touchListener = object : StoryTouchListener(requireContext()) {
 
             override fun onCLickLeft(): Boolean {
@@ -450,15 +449,15 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         lastView?.tag = resUpdateLastView
         lastView?.setImageDrawable(resUpdateLastView?.let { resources.getDrawable(it) })
     }
-      
+
     private fun setSharing(idStory: String) {
         share.setOnClickListener {
             val shareIntent = Intent.createChooser(Intent().apply {
                 action = Intent.ACTION_SEND
                 type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, context?.resources?.getString(R.string.sharing_url,idStory))
+                putExtra(Intent.EXTRA_TEXT, context?.resources?.getString(R.string.sharing_url, idStory))
                 flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-            },null)
+            }, null)
             startActivity(shareIntent)
         }
     }
@@ -627,7 +626,6 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                             ConstraintSet.START,
                             pxToDp(avatarMargin)
                         )
-
                     }
                     UiConfig.VerticalAlignment.BOTTOM -> {
                         constraintSet.setVerticalBias(id, STATUSBAR_VERTICAL_BOTTOM_BIAS)
@@ -797,7 +795,6 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                 if (typeStory == TypeStory.VIDEO_TYPE && videoPlayer?.isPlaying() == false) {
                     if (videoPrepared)
                         startVideo()
-
                 } else {
                     if (storiesStatus != null && image?.drawable != null) {
                         storiesStatus.resume()

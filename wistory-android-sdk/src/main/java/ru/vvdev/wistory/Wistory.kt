@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import kotlinx.android.synthetic.main.wistory_fragment.view.*
 
 object Wistory {
 
@@ -20,6 +19,8 @@ object Wistory {
     fun initialize(application: Application) {
         this.applicationContext = application.applicationContext
     }
+
+    fun singleStory(context: Context): SingleStory = SingleStory(context)
 
     val token: String?
         get() {

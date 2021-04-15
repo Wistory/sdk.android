@@ -5,12 +5,17 @@ import ru.vvdev.wistory.internal.data.models.PollRequest
 import ru.vvdev.wistory.internal.data.models.ReadRequest
 import ru.vvdev.wistory.internal.data.models.RelationRequest
 import ru.vvdev.wistory.internal.data.models.Story
+import ru.vvdev.wistory.internal.data.models.StoryByEvent
 import ru.vvdev.wistory.internal.data.network.StoriesApi
 
 internal class StoriesRepository {
 
     suspend fun getStories(): ArrayList<Story>? {
         return StoriesApi.getStoryService()?.listRepos()
+    }
+
+    suspend fun getByEventId(eventId: Int): StoryByEvent? {
+        return StoriesApi.getStoryService()?.getByEventId(eventId)
     }
 
     suspend fun register(): Any? {

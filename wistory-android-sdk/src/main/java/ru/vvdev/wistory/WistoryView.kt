@@ -19,7 +19,6 @@ class WistoryView @JvmOverloads constructor(
 ) : RelativeLayout(context, attrs, defStyle) {
 
     var eventListener: StoryEventListener? = null
-
     var serverUrl: String? = null
     var token: String? = null
     var fragmentManager: FragmentManager? = null
