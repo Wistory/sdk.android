@@ -29,6 +29,6 @@ object Wistory {
 
     val serverUrl: String?
         get() {
-            return "${app.metaData.getString("WISTORY_SERVER_URL") ?: applicationContext.resources.getString(R.string.wistory_base_url)}"
+            return app.metaData.getString("WISTORY_SERVER_URL") ?: applicationContext.resources.getString(R.string.wistory_base_url)
         }
 }
