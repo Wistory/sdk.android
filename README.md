@@ -2,10 +2,6 @@
 
 [![](https://jitpack.io/v/Wistory/library.svg)](https://jitpack.io/#Wistory/library)
 
-## Download
-
-[![](https://jitpack.io/v/Wistory/library.svg)](https://jitpack.io/#Wistory/library)
-
 Use Gradle:
 
 ```gradle
@@ -18,11 +14,11 @@ dependencies {
 }
 ```
 
-, ```tag``` is a current version of library
+```tag``` is a current version of library
 
 
 ## Integration guide
-First put the wistory view in your layout xml :
+First put the wistory view in your layout xml:
 
 ```xml
 <ru.vvdev.wistory.WistoryView
@@ -32,7 +28,7 @@ First put the wistory view in your layout xml :
 
 ```
 
-Add your company token and server url into manifest :
+Add your company token and server url into manifest:
 
 ```xml
 <meta-data
@@ -45,7 +41,7 @@ Add your company token and server url into manifest :
 
 ```
 
-And initialize library in application class :
+And initialize library in application class:
 
 ```kotlin
 class App : Application() {
@@ -55,6 +51,12 @@ class App : Application() {
         Wistory.initialize(this)
     }
 }
+```
+
+If you need open story by event, use this function:
+
+```kotlin
+Wistory.openStory(requireContext(), eventId)
 ```
 
 ## Customise
