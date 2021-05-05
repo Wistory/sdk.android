@@ -20,7 +20,7 @@ object Wistory {
         this.applicationContext = application.applicationContext
     }
 
-    fun singleStory(context: Context): SingleStory = SingleStory(context)
+    fun openStoriesByEventId(context: Context, eventId: Int): Stories = Stories(context, eventId)
 
     val token: String?
         get() {
@@ -29,6 +29,10 @@ object Wistory {
 
     val serverUrl: String?
         get() {
-            return app.metaData.getString("WISTORY_SERVER_URL") ?: applicationContext.resources.getString(R.string.wistory_base_url)
+            return "${
+                app.metaData.getString("WISTORY_SERVER_URL") ?: applicationContext.resources.getString(
+                    R.string.wistory_base_url
+                )
+            }"
         }
 }

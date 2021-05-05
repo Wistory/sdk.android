@@ -21,13 +21,12 @@ class StoryEventFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val view = Wistory.singleStory(requireContext())
+        val view = Wistory.openStoriesByEventId(requireContext(), 14)
         view {
             token =
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmM3NjJjYTFmZTcwMzc4MDg0ZmNjMzgiLCJpYXQiOjE2MDY5MDI0NzR9.oX3IXdwucxb73DCkNJVGhvYN1n4Zs5WddzEI8yiKtwE"
             serverUrl = getString(baseServer)
             config = UiConfig().apply { format = UiConfig.Format.FULLSCREEN }
-            eventId = 14
         }
     }
 }
