@@ -276,7 +276,8 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
     private fun setValues(story: Story, uiConfig: UiConfig) {
         videoPrepared = false
-        createStoryHeader(story)
+        if (uiConfig.storyTitleState == UiConfig.StoryTitleState.VISIBLE)
+            createStoryHeader(story)
 
         story.content[getCurrentSnap()].apply {
 
@@ -455,7 +456,10 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
             val shareIntent = Intent.createChooser(Intent().apply {
                 action = Intent.ACTION_SEND
                 type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, context?.resources?.getString(R.string.sharing_url, idStory))
+                putExtra(
+                    Intent.EXTRA_TEXT,
+                    context?.resources?.getString(R.string.sharing_url, idStory)
+                )
                 flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
             }, null)
             startActivity(shareIntent)

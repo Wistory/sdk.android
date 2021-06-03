@@ -75,6 +75,7 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
             serverUrl = getString(baseServer)
             config {
                 format = UiConfig.Format.FIXED
+                storyTitleState = UiConfig.StoryTitleState.GONE
             }
             eventListener = this@MainActivity
         }
