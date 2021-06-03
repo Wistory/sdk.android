@@ -193,7 +193,7 @@
 
 
         <ImageView
-            android:id="@+id/headerAvatar"
+            android:id="@+id/ivHeaderAvatar"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginTop="10dp"
@@ -209,8 +209,8 @@
             android:layout_marginStart="9dp"
             android:textSize="14sp"
             android:visibility="gone"
-            app:layout_constraintStart_toEndOf="@id/headerAvatar"
-            app:layout_constraintTop_toTopOf="@id/headerAvatar" />
+            app:layout_constraintStart_toEndOf="@id/ivHeaderAvatar"
+            app:layout_constraintTop_toTopOf="@id/ivHeaderAvatar" />
 
 
         <ImageView

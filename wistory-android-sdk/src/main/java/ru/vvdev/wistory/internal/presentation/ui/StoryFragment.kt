@@ -16,6 +16,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -276,6 +277,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
     private fun setValues(story: Story, uiConfig: UiConfig) {
         videoPrepared = false
+
         if (uiConfig.storyTitleState == UiConfig.StoryTitleState.VISIBLE)
             createStoryHeader(story)
 
@@ -335,11 +337,13 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     }
 
     private fun createStoryHeader(story: Story) {
+        ivHeaderAvatar.isVisible = true
+        tvStoryHeader.isVisible = true
         if (story.thumbnail.isNotEmpty() && story.title.isNotEmpty()) {
             Glide.with(requireContext())
                 .load(story.thumbnail)
                 .apply(RequestOptions().transforms(CenterCrop(), RoundedCorners(60)))
-                .into(headerAvatar)
+                .into(ivHeaderAvatar)
             setStoryHeaderText(story.title)
         }
     }
@@ -626,7 +630,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                             pxToDp(closeTopMargin)
                         )
                         constraintSet.setMargin(
-                            headerAvatar.id,
+                            ivHeaderAvatar.id,
                             ConstraintSet.START,
                             pxToDp(avatarMargin)
                         )
@@ -645,7 +649,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                             pxToDp(closeParentTopMargin)
                         )
                         constraintSet.setMargin(
-                            headerAvatar.id,
+                            ivHeaderAvatar.id,
                             ConstraintSet.START,
                             pxToDp(avatarMargin)
                         )
