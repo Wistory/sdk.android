@@ -193,10 +193,11 @@
 
 
         <ImageView
-            android:id="@+id/headerAvatar"
+            android:id="@+id/ivHeaderAvatar"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginTop="10dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/close"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/close" />
@@ -207,8 +208,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="9dp"
             android:textSize="14sp"
-            app:layout_constraintStart_toEndOf="@id/headerAvatar"
-            app:layout_constraintTop_toTopOf="@id/headerAvatar" />
+            android:visibility="gone"
+            app:layout_constraintStart_toEndOf="@id/ivHeaderAvatar"
+            app:layout_constraintTop_toTopOf="@id/ivHeaderAvatar" />
 
 
         <ImageView
@@ -285,6 +287,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1">
+
             <ImageView
                 android:id="@+id/share"
                 android:layout_width="28dp"
