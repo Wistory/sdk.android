@@ -65,8 +65,8 @@ You can customize wistory view
 by xml:
 
   - `format` can be `fixed` or `fullscreen`
-
   - `statusBarAlignment` can be at `top` or at `bottom`
+  - `storyTitleState` can be at `UiConfig.StoryTitleState.GONE` or at `UiConfig.StoryTitleState.VISIBLE`
 
 or by code using Kotlin DSL:
 
@@ -75,6 +75,7 @@ storiesView {
     config {
         format = UiConfig.Format.FIXED
         statusBarPosition = UiConfig.VerticalAlignment.BOTTOM
+        storyTitleState = UiConfig.StoryTitleState.VISIBLE
     }
 }
 ```
