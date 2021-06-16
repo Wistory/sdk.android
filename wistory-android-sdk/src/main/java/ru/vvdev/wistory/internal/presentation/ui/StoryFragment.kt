@@ -67,6 +67,8 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         private const val STORY_FIXED_RATIO = "9:14.6"
         private const val STORY_RELATION_LIKE = "like"
         private const val STORY_RELATION_DISLIKE = "dislike"
+        private const val UPDATE_STORY_RELATION_LIKE = "updateLike"
+        private const val UPDATE_STORY_RELATION_DISLIKE = "updateDislike"
         private const val STORY_HEADER_LENGTH = 43
         private const val STATUSBAR_VERTICAL_BOTTOM_BIAS = 0.97f
         private const val STATUSBAR_VERTICAL_TOP_BIAS = 0.04f
@@ -351,10 +353,10 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         setFavoriteIcon(story.favorite)
 
         like.setOnClickListener {
-            updateRelation(story, position, STORY_RELATION_LIKE)
+            updateRelation(story, position, UPDATE_STORY_RELATION_LIKE)
         }
         dislike.setOnClickListener {
-            updateRelation(story, position, STORY_RELATION_DISLIKE)
+            updateRelation(story, position, UPDATE_STORY_RELATION_DISLIKE)
         }
         favorite.setOnClickListener {
             val isFavorite =
@@ -405,7 +407,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     private fun setLike(liked: String?) {
 
         when (liked) {
-            STORY_RELATION_LIKE -> if (like.tag == R.drawable.wistory_ic_like)
+            UPDATE_STORY_RELATION_LIKE -> if (like.tag == R.drawable.wistory_ic_like)
                 updateImageView(
                     like,
                     R.drawable.wistory_ic_not_like,
@@ -420,7 +422,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                     R.drawable.wistory_ic_not_dislike
                 )
 
-            STORY_RELATION_DISLIKE -> if (dislike.tag == R.drawable.wistory_ic_dislike)
+            UPDATE_STORY_RELATION_DISLIKE -> if (dislike.tag == R.drawable.wistory_ic_dislike)
                 updateImageView(
                     like,
                     R.drawable.wistory_ic_not_like,
@@ -434,6 +436,18 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                     dislike,
                     R.drawable.wistory_ic_dislike
                 )
+            STORY_RELATION_LIKE -> updateImageView(
+                like,
+                R.drawable.wistory_ic_like,
+                dislike,
+                R.drawable.wistory_ic_not_dislike
+            )
+            STORY_RELATION_DISLIKE -> updateImageView(
+                like,
+                R.drawable.wistory_ic_not_like,
+                dislike,
+                R.drawable.wistory_ic_dislike
+            )
         }
     }
 
@@ -455,7 +469,10 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
             val shareIntent = Intent.createChooser(Intent().apply {
                 action = Intent.ACTION_SEND
                 type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, context?.resources?.getString(R.string.sharing_url, idStory))
+                putExtra(
+                    Intent.EXTRA_TEXT,
+                    context?.resources?.getString(R.string.sharing_url, idStory)
+                )
                 flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
             }, null)
             startActivity(shareIntent)
