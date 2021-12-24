@@ -680,9 +680,9 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     }
 
     private fun createButton(snap: SnapModel) {
-        var clickableButton: View? = null
+        var clickableButton: View?
         snap.button?.let { button ->
-            if (button.alignmentConfig != UiConfig.HorizontalAlignment.FULL_SCREEN) {
+            if (!button.isFullScreenButton()) {
                 clickableButton = action_button
                 action_button.visibility = View.VISIBLE
                 setButtonAlignment(button.alignmentConfig)

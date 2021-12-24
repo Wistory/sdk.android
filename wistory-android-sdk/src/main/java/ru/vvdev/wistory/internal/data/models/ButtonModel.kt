@@ -13,21 +13,28 @@ internal data class ButtonModel(
     val valueUrl: String
 ) : Serializable {
 
+    companion object {
+        const val ALIGNMENT_LEFT = "left"
+        const val ALIGNMENT_RIGHT = "right"
+        const val ALIGNMENT_CENTER = "center"
+        const val ALIGNMENT_FULL_SCREEN = "fullScreen"
+    }
+
     var alignmentConfig: UiConfig.HorizontalAlignment
         get() {
             return when (alignment) {
-                "left" -> UiConfig.HorizontalAlignment.LEFT
-                "right" -> UiConfig.HorizontalAlignment.RIGHT
-                "fullScreen" -> UiConfig.HorizontalAlignment.FULL_SCREEN
+                ALIGNMENT_LEFT -> UiConfig.HorizontalAlignment.LEFT
+                ALIGNMENT_RIGHT -> UiConfig.HorizontalAlignment.RIGHT
                 else -> UiConfig.HorizontalAlignment.CENTER
             }
         }
         set(value) {
             alignment = when (value) {
-                UiConfig.HorizontalAlignment.LEFT -> "left"
-                UiConfig.HorizontalAlignment.RIGHT -> "right"
-                UiConfig.HorizontalAlignment.FULL_SCREEN -> "fullScreen"
-                else -> "center"
+                UiConfig.HorizontalAlignment.LEFT -> ALIGNMENT_LEFT
+                UiConfig.HorizontalAlignment.RIGHT -> ALIGNMENT_RIGHT
+                else -> ALIGNMENT_CENTER
             }
         }
+
+    fun isFullScreenButton() = alignment == ALIGNMENT_FULL_SCREEN
 }
