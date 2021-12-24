@@ -689,7 +689,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                 action_button.text = button.text
                 if (!button.color.isNullOrEmpty())
                     action_button.backgroundTintList =
-                        ColorStateList.valueOf(button.color!!.parseHexColor())
+                        ColorStateList.valueOf(button.color.parseHexColor())
                 if (!button.textColor.isNullOrEmpty())
                     action_button.setTextColor(
                         ColorStateList.valueOf(button.textColor.parseHexColor())

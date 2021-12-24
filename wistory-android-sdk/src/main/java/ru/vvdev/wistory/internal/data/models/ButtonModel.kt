@@ -5,7 +5,7 @@ import ru.vvdev.wistory.UiConfig
 
 internal data class ButtonModel(
     private var alignment: String,
-    var color: String?,
+    val color: String?,
     val textColor: String?,
     val text: String,
     val action: String,
