@@ -6,7 +6,7 @@ class UiConfig : Serializable {
     enum class Format : Serializable { FULLSCREEN, FIXED }
     enum class StoryTitleState : Serializable { VISIBLE, GONE }
     enum class Theme : Serializable { LIGHT, DARK, UNDEFINED }
-    enum class HorizontalAlignment : Serializable { LEFT, RIGHT, CENTER }
+    enum class HorizontalAlignment : Serializable { LEFT, RIGHT, CENTER}
     enum class VerticalAlignment : Serializable { TOP, CENTER, BOTTOM }
 
     var format: Format = Format.FIXED
