@@ -5,8 +5,8 @@ import ru.vvdev.wistory.UiConfig
 
 internal data class ButtonModel(
     private var alignment: String,
-    var color: String,
-    val textColor: String,
+    var color: String?,
+    val textColor: String?,
     val text: String,
     val action: String,
     val value: String?,
@@ -18,6 +18,7 @@ internal data class ButtonModel(
             return when (alignment) {
                 "left" -> UiConfig.HorizontalAlignment.LEFT
                 "right" -> UiConfig.HorizontalAlignment.RIGHT
+                "fullScreen" -> UiConfig.HorizontalAlignment.FULL_SCREEN
                 else -> UiConfig.HorizontalAlignment.CENTER
             }
         }
@@ -25,6 +26,7 @@ internal data class ButtonModel(
             alignment = when (value) {
                 UiConfig.HorizontalAlignment.LEFT -> "left"
                 UiConfig.HorizontalAlignment.RIGHT -> "right"
+                UiConfig.HorizontalAlignment.FULL_SCREEN -> "fullScreen"
                 else -> "center"
             }
         }
