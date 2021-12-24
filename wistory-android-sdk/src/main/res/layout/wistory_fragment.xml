@@ -160,9 +160,23 @@
             android:textSize="16sp"
             android:textStyle="bold"
             android:translationZ="1dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.95" />
+
+        <FrameLayout
+            android:id="@+id/fullScreenButton"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/storiesStatus"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginTop="125dp"
+            android:layout_marginBottom="100dp"
+            android:translationZ="1dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ru.vvdev.wistory.internal.presentation.views.StoryStatusView
             android:id="@+id/storiesStatus"

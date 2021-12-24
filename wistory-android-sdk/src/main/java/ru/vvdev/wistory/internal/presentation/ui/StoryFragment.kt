@@ -680,17 +680,27 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     }
 
     private fun createButton(snap: SnapModel) {
-
+        var clickableButton: View?
         snap.button?.let { button ->
-            action_button.visibility = View.VISIBLE
-            setButtonAlignment(button.alignmentConfig)
-            action_button.text = button.text
-            action_button.backgroundTintList =
-                ColorStateList.valueOf(button.color.parseHexColor())
-            action_button.setTextColor(
-                ColorStateList.valueOf(button.textColor.parseHexColor())
-            )
-            action_button.setOnClickListener {
+            if (!button.isFullScreenButton()) {
+                clickableButton = action_button
+                action_button.visibility = View.VISIBLE
+                setButtonAlignment(button.alignmentConfig)
+                action_button.text = button.text
+                if (!button.color.isNullOrEmpty())
+                    action_button.backgroundTintList =
+                        ColorStateList.valueOf(button.color.parseHexColor())
+                if (!button.textColor.isNullOrEmpty())
+                    action_button.setTextColor(
+                        ColorStateList.valueOf(button.textColor.parseHexColor())
+                    )
+
+            } else {
+                clickableButton = fullScreenButton
+                fullScreenButton.isVisible = true
+                setFullScreenButtonAlignment(snap)
+            }
+            clickableButton?.setOnClickListener {
                 storyFragmentCallback?.storyEvent(
                     NavigateEvent(
                         button.action,
@@ -699,11 +709,60 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                     )
                 )
             }
-        } ?: removeButton()
+        }
     }
 
-    private fun removeButton() {
-        action_button.visibility = View.GONE
+    private fun setFullScreenButtonAlignment(snap: SnapModel) {
+        val constraintSet = ConstraintSet()
+        constraintSet.connect(
+            fullScreenButton.id,
+            ConstraintSet.END,
+            baseLayout.id,
+            ConstraintSet.END,
+            pxToDp(20)
+        )
+        constraintSet.connect(
+            fullScreenButton.id,
+            ConstraintSet.START,
+            baseLayout.id,
+            ConstraintSet.START,
+            pxToDp(20)
+        )
+
+        when (snap.statusbar?.alignmentConfig) {
+            UiConfig.VerticalAlignment.TOP -> {
+                constraintSet.connect(
+                    fullScreenButton.id,
+                    ConstraintSet.TOP,
+                    storiesStatus.id,
+                    ConstraintSet.BOTTOM,
+                    pxToDp(20)
+                )
+                constraintSet.connect(
+                    fullScreenButton.id,
+                    ConstraintSet.BOTTOM,
+                    feelActions.id,
+                    ConstraintSet.TOP,
+                    pxToDp(20)
+                )
+            }
+            UiConfig.VerticalAlignment.BOTTOM -> {
+                constraintSet.connect(
+                    fullScreenButton.id,
+                    ConstraintSet.TOP,
+                    textBlock.id,
+                    ConstraintSet.BOTTOM,
+                    pxToDp(20)
+                )
+                constraintSet.connect(
+                    fullScreenButton.id,
+                    ConstraintSet.BOTTOM,
+                    storiesStatus.id,
+                    ConstraintSet.TOP,
+                    pxToDp(20)
+                )
+            }
+        }
     }
 
     private fun setVoteStory(snapModel: SnapModel) {
