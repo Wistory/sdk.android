@@ -2,10 +2,12 @@ package ru.vvdev.wistory.internal.presentation.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import ru.vvdev.wistory.ServerConfig
 import ru.vvdev.wistory.UiConfig
@@ -23,13 +25,16 @@ internal abstract class AbstractWistoryFragment : Fragment(), StoryEventListener
         internal const val CONFIG = "config"
         internal const val SERVER_URL = "serverUrl"
         internal const val REGISTRATION_ID = "registrationId"
+        internal const val IS_OPEN_FROM_UNREAD_STORY = "IS_OPEN_FROM_UNREAD_STORY"
     }
 
+    // TODO выпилить отсюда null переменные
     internal var config: UiConfig? = null
     internal var token: String? = null
     internal var serverUrl: String? = null
     internal var registrationId: String? = null
     internal var eventId: Int? = null
+    internal var isOpenFromUnreadStory: Boolean? = null
 
     internal lateinit var viewModel: WistoryViewModel
 
@@ -39,7 +44,7 @@ internal abstract class AbstractWistoryFragment : Fragment(), StoryEventListener
     internal fun navigateToStory(position: Int) {
         requireActivity().startActivity(Intent(activity, StoryActivity::class.java).apply {
             putExtra(StoryActivity.ARG_TYPE, StoryActivity.TYPE_STORIES)
-            putExtra(StoryActivity.ARG_STORIES, viewModel.storyItems.value?.toTypedArray())
+            putExtra(StoryActivity.ARG_STORIES, viewModel.mStoryItems.value?.toTypedArray())
             putExtra(StoryActivity.ARG_POSITION, position)
             putExtra(StoryActivity.ARG_SETTINGS, config)
         })
@@ -49,14 +54,26 @@ internal abstract class AbstractWistoryFragment : Fragment(), StoryEventListener
         super.onViewCreated(view, savedInstanceState)
         initListener()
         initApiService()
-        viewModel = ViewModelProviders.of(currentFragment(), ViewModelFactory(StoriesRepository()))
-            .get(WistoryViewModel::class.java)
+        viewModel = ViewModelProvider(
+            currentFragment(),
+            ViewModelFactory(StoriesRepository(), isOpenFromUnreadStory ?: false)
+        ).get(WistoryViewModel::class.java)
         viewModel.register(eventId)
         viewModel.errorLiveData.sub {
             it?.let {
                 postException(it)
                 viewModel.errorLiveData.value = null
             }
+        }
+        viewModel.errorLiveData.sub {
+            it?.let {
+                postException(it)
+                viewModel.errorLiveData.value = null
+            }
+        }
+        viewModel.observeUnreadStoryPosition().sub { pos ->
+            Log.d("NAVIGATION","navigate to unread story, pos: $pos")
+            pos?.let(::navigateToStory)
         }
     }
 

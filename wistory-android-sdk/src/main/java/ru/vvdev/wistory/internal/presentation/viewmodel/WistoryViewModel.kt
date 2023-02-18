@@ -1,5 +1,6 @@
 package ru.vvdev.wistory.internal.presentation.viewmodel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,10 +14,14 @@ import ru.vvdev.wistory.internal.domain.events.UpdateOnFavoriteEvent
 import ru.vvdev.wistory.internal.domain.events.UpdateOnPollEvent
 import ru.vvdev.wistory.internal.domain.events.UpdateOnReadEvent
 import ru.vvdev.wistory.internal.domain.events.UpdateOnRelationEvent
+import java.util.UUID
 
-internal class WistoryViewModel(private val storiesRepository: StoriesRepository) : ViewModel() {
+internal class WistoryViewModel(
+    private val storiesRepository: StoriesRepository,
+    private val isOpenFromUnreadStory: Boolean
+) : ViewModel() {
 
-    val storyItems = MutableLiveData<ArrayList<Story>>()
+    val mStoryItems = MutableLiveData<ArrayList<Story>>()
     val favoriteStoryItems = MutableLiveData<ArrayList<Story>>()
     var errorLiveData = MutableLiveData<Exception>()
     var updateLiveData = MediatorLiveData<ArrayList<UpdateEvent>>()
@@ -31,11 +36,11 @@ internal class WistoryViewModel(private val storiesRepository: StoriesRepository
         viewModelScope.launch {
             try {
                 when (storiesRepository.register()) {
-                    is RegisterResponse -> storyItems.value.run { getItems(eventId) }
+                    is RegisterResponse -> mStoryItems.value.run { getItems(eventId) }
                 }
             } catch (e: Exception) {
-                errorLiveData.setValue(e)
-                storyItems.value.run { getItems(eventId) }
+                errorLiveData.value = e
+                mStoryItems.value.run { getItems(eventId) }
             }
         }
     }
@@ -44,12 +49,14 @@ internal class WistoryViewModel(private val storiesRepository: StoriesRepository
         viewModelScope.launch {
             try {
                 val list: ArrayList<Story>? =
-                    if (eventId == null) storiesRepository.getStories()?.apply {
-                        storyItems.value = this
-                        getFavoriteItems()
+                    if (eventId == null) {
+                        storiesRepository.getStories()?.apply {
+                            getFavoriteItems()
+                        }
+                    } else {
+                        storiesRepository.getByEventId(eventId)?.stories
                     }
-                    else storiesRepository.getByEventId(eventId)?.stories
-                storyItems.value = list
+                mStoryItems.value = list
             } catch (e: Exception) {
                 errorLiveData.value = e
             }
@@ -133,5 +140,18 @@ internal class WistoryViewModel(private val storiesRepository: StoriesRepository
 
     fun publishEvents() {
         updateLiveData.value = updateList
+    }
+
+    fun observeUnreadStoryPosition(): LiveData<Int?> = object : MediatorLiveData<Int>() {
+        init {
+            addSource(mStoryItems) { items ->
+                val indexOfFresh = items.indexOfFirst { it.fresh }
+                value = if (!isOpenFromUnreadStory && indexOfFresh == -1) {
+                    null
+                } else {
+                    indexOfFresh
+                }
+            }
+        }
     }
 }

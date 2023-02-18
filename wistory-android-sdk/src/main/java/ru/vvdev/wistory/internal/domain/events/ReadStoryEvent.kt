@@ -1,5 +1,3 @@
 package ru.vvdev.wistory.internal.domain.events
 
-import ru.vvdev.wistory.internal.data.models.Story
-
-internal class ReadStoryEvent(val story: Story) : BaseEvent
+internal class ReadStoryEvent(val storyId: String, val snapHash: Int) : BaseEvent

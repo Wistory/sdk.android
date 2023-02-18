@@ -9,6 +9,7 @@ import ru.vvdev.wistory.internal.presentation.callback.StoryEventListener
 import ru.vvdev.wistory.internal.presentation.callback.WistoryCommunication
 import ru.vvdev.wistory.internal.presentation.ui.WistorySoaringFragment
 
+
 class Stories(mContext: Context, val eventId: Int) : View(mContext) {
 
     var eventListener: StoryEventListener? = null
@@ -17,12 +18,18 @@ class Stories(mContext: Context, val eventId: Int) : View(mContext) {
     var config: UiConfig? = UiConfig()
     val registrationId: String? = null
 
+    /**
+     * @see isOpenFromUnreadStory - если true открывает истории с непросмотренной, false - открывает истории сначала
+     * */
+    var isOpenFromUnreadStory: Boolean = false
+
     private fun initStory(
         eventListener: StoryEventListener? = null,
         serverUrl: String? = null,
         token: String? = null,
         config: UiConfig? = UiConfig(),
-        registrationId: String? = null
+        registrationId: String? = null,
+        isOpenFromUnreadStory: Boolean
     ) {
         try {
             eventListener?.let {
@@ -30,22 +37,40 @@ class Stories(mContext: Context, val eventId: Int) : View(mContext) {
                 WistoryCommunication.getInstance().addCallBackListener(it)
             }
 
-            eventId.apply {
-                getFragmentManager(context)?.beginTransaction()
-                    ?.addToBackStack(null)
-                    ?.add(
-                        android.R.id.content,
-                        WistorySoaringFragment.newInstance(
-                            token,
-                            serverUrl,
-                            registrationId,
-                            config,
-                            this
-                        )
-                    )?.commit()
-            }
+            routeToWistorySoaringFragment(
+                eventId,
+                serverUrl,
+                token,
+                config,
+                registrationId,
+                isOpenFromUnreadStory
+            )
+
         } catch (e: Exception) {
         }
+    }
+
+    private fun routeToWistorySoaringFragment(
+        eventId: Int,
+        serverUrl: String?,
+        token: String?,
+        config: UiConfig?,
+        registrationId: String?,
+        isOpenFromUnreadStory: Boolean
+    ) {
+        getFragmentManager(context)?.beginTransaction()
+            ?.addToBackStack(null)
+            ?.add(
+                android.R.id.content,
+                WistorySoaringFragment.newInstance(
+                    token,
+                    serverUrl,
+                    registrationId,
+                    config,
+                    eventId,
+                    isOpenFromUnreadStory
+                )
+            )?.commit()
     }
 
     private fun getFragmentManager(context: Context?): FragmentManager? {
@@ -57,6 +82,6 @@ class Stories(mContext: Context, val eventId: Int) : View(mContext) {
     }
 
     operator fun invoke(block: Stories.() -> Unit): Stories = apply(block).apply {
-        initStory(eventListener, serverUrl, token, config, registrationId)
+        initStory(eventListener, serverUrl, token, config, registrationId, isOpenFromUnreadStory)
     }
 }

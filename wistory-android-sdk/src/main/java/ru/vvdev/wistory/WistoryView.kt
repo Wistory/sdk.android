@@ -24,6 +24,7 @@ class WistoryView @JvmOverloads constructor(
     var fragmentManager: FragmentManager? = null
     var registrationId: String? = null
     var config: UiConfig = UiConfig()
+    var isAutoOpenUnreadStory: Boolean = false
 
     init {
         LayoutInflater.from(context).inflate(R.layout.wistory_view, this)
@@ -50,21 +51,23 @@ class WistoryView @JvmOverloads constructor(
             fragmentManager?.fragments
             fragmentManager?.apply {
                 findFragmentByTag(WistoryListFragment::class.java.simpleName)?.let {
-                    WistoryCommunication.getInstance().removeCallbackListener(it as WistoryListFragment)
+                    WistoryCommunication.getInstance()
+                        .removeCallbackListener(it as WistoryListFragment)
                 }
                 beginTransaction().replace(
-                        R.id.fragmentContainerView,
-                        WistoryListFragment.newInstance(
-                            token ?: Wistory.token,
-                            serverUrl ?: Wistory.serverUrl,
-                            registrationId,
-                            config
-                        ),
-                        WistoryListFragment::class.java.simpleName
-                    ).commit()
+                    R.id.fragmentContainerView,
+                    WistoryListFragment.newInstance(
+                        token ?: Wistory.token,
+                        serverUrl ?: Wistory.serverUrl,
+                        registrationId,
+                        config,
+                        isAutoOpenUnreadStory
+                    ),
+                    WistoryListFragment::class.java.simpleName
+                ).commit()
             }
         } catch (e: Exception) {
-            e
+            e.printStackTrace()
         }
     }
 
