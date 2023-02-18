@@ -12,6 +12,8 @@ import ru.vvdev.wistory.internal.presentation.callback.StoryEventListener
 class MainActivity : AppCompatActivity(), StoryEventListener {
 
     private var baseServer: Int = R.string.wistory_dev_url
+    private var isAutoOpenUnreadStory: Boolean = false
+    private val ffStorage by lazy { FFStorage(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,6 +22,8 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
         swipeToRefresh.setOnRefreshListener {
             applyStories()
         }
+
+        etToken.setText(ffStorage.getToken() ?: "")
 
         swFullscreen.setOnCheckedChangeListener { _, isChecked ->
             storiesView.config.format =
@@ -35,7 +39,14 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
             applyStories()
         }
 
+        swAutoOpen.isChecked = ffStorage.getIsAutoOpenUnread()
+        swAutoOpen.setOnCheckedChangeListener { _, isChecked ->
+            isAutoOpenUnreadStory = isChecked
+            ffStorage.setIsAutoOpenUnread(isChecked)
+        }
+
         btnApply.setOnClickListener {
+            ffStorage.saveToken(etToken.text.toString())
             applyStories()
         }
 
@@ -67,8 +78,8 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
 
     private fun applyStories() {
         storiesView {
-            etToken.text.takeIf { !it.isNullOrEmpty() }?.let {
-                token = it.toString()
+            ffStorage.getToken().takeIf { !it.isNullOrEmpty() }?.let {
+                token = it
             } ?: let {
                 token = null
             }
@@ -78,6 +89,7 @@ class MainActivity : AppCompatActivity(), StoryEventListener {
                 storyTitleState = UiConfig.StoryTitleState.VISIBLE
             }
             eventListener = this@MainActivity
+            isAutoOpenUnreadStory = true
         }
         swipeToRefresh.isRefreshing = false
     }

@@ -9,29 +9,6 @@ import ru.vvdev.wistory.UiConfig
 
 internal class WistorySoaringFragment : AbstractWistoryFragment() {
 
-    companion object {
-        private const val EVENT_ID = "EVENT_ID"
-
-        fun newInstance(
-            token: String?,
-            serverUrl: String?,
-            registrationId: String?,
-            config: UiConfig?,
-            eventId: Int
-        ): WistorySoaringFragment {
-            val args = Bundle()
-            args.putString(TOKEN, token)
-            args.putSerializable(CONFIG, config)
-            args.putString(SERVER_URL, serverUrl)
-            args.putString(REGISTRATION_ID, registrationId)
-            args.putInt(EVENT_ID, eventId)
-
-            val fragment = WistorySoaringFragment()
-            fragment.arguments = args
-            return fragment
-        }
-    }
-
     override fun currentFragment(): Fragment = this
 
     override fun initWistoryParams(arguments: Bundle?) {
@@ -40,6 +17,7 @@ internal class WistorySoaringFragment : AbstractWistoryFragment() {
         registrationId = arguments?.getString(REGISTRATION_ID)
         config = arguments?.getSerializable(CONFIG) as UiConfig
         eventId = arguments.getInt(EVENT_ID)
+        isOpenFromUnreadStory = arguments.getBoolean(IS_OPEN_FROM_UNREAD_STORY)
     }
 
     override fun onCreateView(
@@ -53,7 +31,7 @@ internal class WistorySoaringFragment : AbstractWistoryFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.storyItems.sub { list ->
+        viewModel.mStoryItems.sub { list ->
             list?.let {
                 navigateToStory(0)
                 parentFragmentManager.popBackStack()
@@ -63,5 +41,29 @@ internal class WistorySoaringFragment : AbstractWistoryFragment() {
 
     override fun onPoll(storyId: String, sheet: Int, newpoll: String?, oldpoll: String?) {
         viewModel.onPoll(storyId, sheet, newpoll)
+    }
+    companion object {
+        private const val EVENT_ID = "EVENT_ID"
+
+        fun newInstance(
+            token: String?,
+            serverUrl: String?,
+            registrationId: String?,
+            config: UiConfig?,
+            eventId: Int,
+            isOpenFromUnreadStory: Boolean
+        ): WistorySoaringFragment {
+            val args = Bundle()
+            args.putString(TOKEN, token)
+            args.putSerializable(CONFIG, config)
+            args.putString(SERVER_URL, serverUrl)
+            args.putString(REGISTRATION_ID, registrationId)
+            args.putInt(EVENT_ID, eventId)
+            args.putBoolean(IS_OPEN_FROM_UNREAD_STORY, isOpenFromUnreadStory)
+
+            val fragment = WistorySoaringFragment()
+            fragment.arguments = args
+            return fragment
+        }
     }
 }
