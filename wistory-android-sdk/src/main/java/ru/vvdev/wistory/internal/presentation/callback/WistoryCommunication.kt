@@ -27,7 +27,7 @@ internal class WistoryCommunication private constructor() {
         callbacks.forEach { mainCallback ->
             when (event) {
                 is ReadStoryEvent -> {
-                    mainCallback.onRead(event.story._id)
+                    mainCallback.onRead(event.storyId, event.snapHash)
                 }
                 is VoteEvent -> {
                     mainCallback.onPoll(event.storyId, event.sheet, event.newpoll)
