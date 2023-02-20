@@ -75,9 +75,9 @@ internal open class StoryItem(
         view: View,
         adapter: FlexibleAdapter<out IFlexible<*>>
     ) : FlexibleViewHolder(view, adapter), View.OnClickListener {
-        val image = view.findViewById<ImageView>(R.id.image)
-        val gradient = view.findViewById<ImageView>(R.id.gradient)
-        val historyText = view.findViewById<TextView>(R.id.historyText)
+        val image: ImageView = view.findViewById(R.id.image)
+        val gradient: ImageView = view.findViewById(R.id.gradient)
+        val historyText: TextView = view.findViewById(R.id.historyText)
 
         init {
             view.setOnClickListener(this)

@@ -26,24 +26,6 @@ internal open class WistoryListFragment : AbstractWistoryFragment(),
     private var flexAdapter = FlexibleAdapter<IFlexible<*>>(listOf())
     private var favoriteStoryItem: FavoriteStoryItem? = null
 
-    companion object {
-        fun newInstance(
-            token: String?,
-            serverUrl: String?,
-            registrationId: String?,
-            config: UiConfig?
-        ): WistoryListFragment {
-            val args = Bundle()
-            args.putString(TOKEN, token)
-            args.putSerializable(CONFIG, config)
-            args.putString(SERVER_URL, serverUrl)
-            args.putString(REGISTRATION_ID, registrationId)
-
-            val fragment = WistoryListFragment()
-            fragment.arguments = args
-            return fragment
-        }
-    }
 
     override fun currentFragment(): Fragment = this
 
@@ -67,7 +49,7 @@ internal open class WistoryListFragment : AbstractWistoryFragment(),
         super.onViewCreated(view, savedInstanceState)
         initAdapter()
 
-        viewModel.storyItems.sub { list ->
+        viewModel.mStoryItems.sub { list ->
             list?.let {
                 setItems(it)
             }
@@ -111,13 +93,12 @@ internal open class WistoryListFragment : AbstractWistoryFragment(),
     private fun initAdapter() {
         recyclerView.apply {
             layoutManager = LinearLayoutManager(
-                recyclerView.context,
-                RecyclerView.HORIZONTAL,
-                false
+                recyclerView.context, RecyclerView.HORIZONTAL, false
             )
             adapter = flexAdapter.apply {
-                for (i in 0..4)
+                for (i in 0..4) {
                     addItem(PlaceholderStoryItem())
+                }
             }
         }
     }
@@ -126,21 +107,22 @@ internal open class WistoryListFragment : AbstractWistoryFragment(),
         removeFavoriteItem()
         val currentItemsCount = getStoryItemsCount()
         requireActivity().runOnUiThread {
-            flexAdapter.apply {
-                viewModel.storyItems.value?.let {
-                    if (currentItemsCount > it.size) {
-                        removeRange(it.size, currentItemsCount - it.size)
-                    }
-                    list.forEachIndexed { index, story ->
-                        addOrUpdateItems(
-                            index, if (story.fresh)
-                                StoryItem(context, story, this@WistoryListFragment)
-                            else
-                                ReadedStoryItem(context, story, this@WistoryListFragment)
-                        )
-                    }
+            viewModel.mStoryItems.value?.let {
+                if (currentItemsCount > it.size) {
+                    flexAdapter.removeRange(it.size, currentItemsCount - it.size)
+                }
+                list.forEachIndexed { index, story ->
+                    addOrUpdateItems(index, itemFactory(story))
                 }
             }
+        }
+    }
+
+    private fun itemFactory(story: Story): StoryItem {
+        return if (story.fresh) {
+            StoryItem(context, story, this@WistoryListFragment)
+        } else {
+            ReadedStoryItem(context, story, this@WistoryListFragment)
         }
     }
 
@@ -148,20 +130,22 @@ internal open class WistoryListFragment : AbstractWistoryFragment(),
         index: Int,
         story: StoryItem
     ) {
-        if (index < getStoryItemsCount())
+        if (index < getStoryItemsCount()) {
             flexAdapter.updateItem(index, story, null)
-        else
+        } else {
             flexAdapter.addItem(story)
+        }
     }
 
     private fun addOrUpdateFavoriteItem(
         index: Int,
         story: FavoriteStoryItem
     ) {
-        if (index < getStoryItemsCount())
+        if (index < getStoryItemsCount()) {
             flexAdapter.updateItem(index, story, null)
-        else
+        } else {
             flexAdapter.addItem(story)
+        }
     }
 
     private fun getStoryItemsCount(): Int {
@@ -171,24 +155,23 @@ internal open class WistoryListFragment : AbstractWistoryFragment(),
     }
 
     private fun setFavoriteItems(list: ArrayList<Story>) {
-        flexAdapter.apply {
-            removeFavoriteItem()
-            if (list.isNotEmpty()) {
-                favoriteStoryItem =
-                    FavoriteStoryItem(activity, list, this@WistoryListFragment)
+        removeFavoriteItem()
+        if (list.isNotEmpty()) {
+            favoriteStoryItem =
+                FavoriteStoryItem(activity, list, this@WistoryListFragment)
 
-                addItem(currentItems.size, favoriteStoryItem!!)
-            } else {
-                favoriteStoryItem = null
-            }
+            flexAdapter.addItem(flexAdapter.currentItems.size, favoriteStoryItem!!)
+        } else {
+            favoriteStoryItem = null
         }
     }
 
     private fun removeFavoriteItem() {
         flexAdapter.apply {
             getItem(currentItems.size - 1)?.let {
-                if (it is FavoriteStoryItem)
+                if (it is FavoriteStoryItem) {
                     removeItem(currentItems.size - 1)
+                }
             }
         }
     }
@@ -199,7 +182,7 @@ internal open class WistoryListFragment : AbstractWistoryFragment(),
                 flexAdapter.updateItem(it.apply { data = story })
             }
             getStoryPositionById(storyId)?.let { position ->
-                viewModel.storyItems.value?.add(position, story)
+                viewModel.mStoryItems.value?.add(position, story)
             }
         }
     }
@@ -212,8 +195,8 @@ internal open class WistoryListFragment : AbstractWistoryFragment(),
                     position,
                     ReadedStoryItem(context, story, this@WistoryListFragment)
                 )
-                viewModel.storyItems.value?.remove(story)
-                viewModel.storyItems.value?.add(position, story)
+                viewModel.mStoryItems.value?.remove(story)
+                viewModel.mStoryItems.value?.add(position, story)
             }
         }
     }
@@ -229,16 +212,16 @@ internal open class WistoryListFragment : AbstractWistoryFragment(),
     }
 
     private fun getStoryPositionById(id: String): Int? {
-        viewModel.storyItems.value?.forEachIndexed { index, story ->
+        viewModel.mStoryItems.value?.forEachIndexed { index, story ->
             if (story._id == id) {
-                viewModel.storyItems.value?.remove(story)
+                viewModel.mStoryItems.value?.remove(story)
                 return index
             }
         }
         return null
     }
 
-    override fun onRead(storyId: String) {
+    override fun onRead(storyId: String, snapHash: Int) {
         viewModel.onRead(storyId)
     }
 
@@ -260,5 +243,26 @@ internal open class WistoryListFragment : AbstractWistoryFragment(),
 
     override fun onFavoriteItemClick() {
         navigateToFavoriteList()
+    }
+
+    companion object {
+        fun newInstance(
+            token: String?,
+            serverUrl: String?,
+            registrationId: String?,
+            config: UiConfig?,
+            isAutoOpenUnreadStory: Boolean
+        ): WistoryListFragment {
+            val args = Bundle()
+            args.putString(TOKEN, token)
+            args.putSerializable(CONFIG, config)
+            args.putString(SERVER_URL, serverUrl)
+            args.putString(REGISTRATION_ID, registrationId)
+            args.putBoolean(IS_OPEN_FROM_UNREAD_STORY, isAutoOpenUnreadStory)
+
+            val fragment = WistoryListFragment()
+            fragment.arguments = args
+            return fragment
+        }
     }
 }

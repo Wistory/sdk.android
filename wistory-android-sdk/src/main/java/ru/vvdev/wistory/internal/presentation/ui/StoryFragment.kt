@@ -165,8 +165,9 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
             storyFragmentCallback = activity as StoryFragmentCallback
         }
 
-        if (isFragmentEnabled)
+        if (isFragmentEnabled) {
             readStory()
+        }
     }
 
     override fun onComplete() {
@@ -177,7 +178,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun onPrev() {
         storiesStatus.pause()
-        if (getCurrentSnap() - 1 < 0) {
+        if (getCurrentSnapPosition() - 1 < 0) {
             Handler().postDelayed({
                 storiesStatus.resume()
             }, 300)
@@ -283,7 +284,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         if (uiConfig.storyTitleState == UiConfig.StoryTitleState.VISIBLE)
             createStoryHeader(story)
 
-        story.content[getCurrentSnap()].apply {
+        story.content[getCurrentSnapPosition()].apply {
 
             uiConfig.statusBarPosition?.let {
                 statusbar?.alignmentConfig = it
@@ -364,17 +365,21 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
             updateRelation(story, position, UPDATE_STORY_RELATION_DISLIKE)
         }
         favorite.setOnClickListener {
-            val isFavorite =
-                favorite.tag == R.drawable.wistory_ic_not_favorite
-            setFavoriteIcon(isFavorite)
-            storyFragmentCallback?.storyEvent(
-                FavoriteEvent(
-                    story.apply { favorite = isFavorite },
-                    isFavorite,
-                    position
-                )
-            )
+            favoriteClick(story, position)
         }
+    }
+
+    private fun favoriteClick(story: Story, position: Int) {
+        val isFavorite =
+            favorite.tag == R.drawable.wistory_ic_not_favorite
+        setFavoriteIcon(isFavorite)
+        storyFragmentCallback?.storyEvent(
+            FavoriteEvent(
+                story.apply { favorite = isFavorite },
+                isFavorite,
+                position
+            )
+        )
     }
 
     private fun updateRelation(
@@ -547,7 +552,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
             }
         }
 
-        var arr = ArrayList<Long>()
+        val arr = ArrayList<Long>()
         story.content.forEachIndexed { _, it ->
             arr.add(if (it.duration.toInt() < 10) 1000 else it.duration.toLong())
         }
@@ -777,7 +782,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                         snapModel.themeConfig
                     )
                 )
-                val pos = getCurrentSnap()
+                val pos = getCurrentSnapPosition()
                 setVotingViewList(list, voted, story._id, pos, replay)
             }
             this@StoryFragment.title.visibility = View.GONE
@@ -863,7 +868,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         counter = 0
     }
 
-    override fun getCurrentSnap() = counter
+    override fun getCurrentSnapPosition() = counter
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
 
@@ -874,8 +879,9 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
             readStory()
             Handler().postDelayed({
                 if (typeStory == TypeStory.VIDEO_TYPE && videoPlayer?.isPlaying() == false) {
-                    if (videoPrepared)
+                    if (videoPrepared) {
                         startVideo()
+                    }
                 } else {
                     if (storiesStatus != null && image?.drawable != null) {
                         storiesStatus.resume()
@@ -894,11 +900,12 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
     private fun readStory() {
         val story: Story? = arguments?.getSerializable(ARG_STORY) as Story
+        val snapPos = getCurrentSnapPosition()
         story?.let {
             storyFragmentCallback?.run {
                 if (story.fresh) {
                     story.fresh = false
-                    storyEvent(ReadStoryEvent(story))
+                    storyEvent(ReadStoryEvent(story._id, story.content[snapPos].hashCode()))
                 }
             }
         }
@@ -943,10 +950,11 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
             if (imageProgressBar != null) {
                 imageProgressBar.visibility = View.INVISIBLE
-                if (isFragmentEnabled)
+                if (isFragmentEnabled) {
                     Handler().postDelayed({
                         storiesStatus?.resume()
                     }, 300)
+                }
             }
         }
     }
