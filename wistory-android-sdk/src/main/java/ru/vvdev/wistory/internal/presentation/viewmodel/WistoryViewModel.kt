@@ -49,11 +49,13 @@ internal class WistoryViewModel(
         viewModelScope.launch {
             try {
                 val list: ArrayList<Story>? =
-                    if (eventId == null) storiesRepository.getStories()?.apply {
-                        mStoryItems.value = this
-                        getFavoriteItems()
+                    if (eventId == null) {
+                        storiesRepository.getStories()?.apply {
+                            getFavoriteItems()
+                        }
+                    } else {
+                        storiesRepository.getByEventId(eventId)?.stories
                     }
-                    else storiesRepository.getByEventId(eventId)?.stories
                 mStoryItems.value = list
             } catch (e: Exception) {
                 errorLiveData.value = e

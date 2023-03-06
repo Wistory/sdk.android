@@ -2,6 +2,7 @@ package ru.vvdev.wistory.internal.presentation.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
@@ -71,6 +72,7 @@ internal abstract class AbstractWistoryFragment : Fragment(), StoryEventListener
             }
         }
         viewModel.observeUnreadStoryPosition().sub { pos ->
+            Log.d("NAVIGATION","navigate to unread story, pos: $pos")
             pos?.let(::navigateToStory)
         }
     }
