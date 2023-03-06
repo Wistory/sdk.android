@@ -51,13 +51,18 @@ open class StoryTouchListener(context: Context) : View.OnTouchListener {
                 onCLickLeft()
             }
         } else if (event.action == MotionEvent.ACTION_DOWN || event.action == MotionEvent.ACTION_MOVE) {
-                stopHandler.postDelayed(stopRunnable, 500)
-                resumeHandler.removeCallbacksAndMessages(null)
-            } else {
-                resumeHandler.postDelayed(resumeRunnable, MAX_CLICK_DURATION)
-            }
+            stopHandler.postDelayed(stopRunnable, 500)
+            resumeHandler.removeCallbacksAndMessages(null)
+        } else {
+            resumeHandler.postDelayed(resumeRunnable, MAX_CLICK_DURATION)
+        }
 
         return true
+    }
+
+    fun destroy() {
+        resumeHandler.removeCallbacksAndMessages(null)
+        stopHandler.removeCallbacksAndMessages(null)
     }
 
     private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {

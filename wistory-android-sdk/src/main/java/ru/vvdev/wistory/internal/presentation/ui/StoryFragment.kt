@@ -105,15 +105,8 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
         return inflater.inflate(R.layout.wistory_fragment, container, false)
     }
 
-    @RequiresApi(Build.VERSION_CODES.KITKAT)
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        audioService = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        close.setOnClickListener {
-            requireActivity().finish()
-        }
-        retainInstance
-        val touchListener = object : StoryTouchListener(requireContext()) {
+    private val touchListener by lazy {
+        object : StoryTouchListener(requireContext()) {
 
             override fun onCLickLeft(): Boolean {
                 storiesStatus.reverse()
@@ -126,6 +119,7 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
             }
 
             override fun onCLickStop(): Boolean {
+                // if (image == null) return true
                 if (image.drawable != null || videoPlayer?.isPlaying() == true)
                     storyPlayAgain = true
                 if (typeStory == TypeStory.VIDEO_TYPE)
@@ -154,6 +148,17 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
                 return true
             }
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        audioService = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        close.setOnClickListener {
+            requireActivity().finish()
+        }
+        retainInstance
+
 
         reverse.setOnTouchListener(touchListener)
         skip.setOnTouchListener(touchListener)
@@ -200,8 +205,9 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
     override fun onDestroy() {
         super.onDestroy()
-        if (storiesStatus != null)
+        if (storiesStatus != null) {
             storiesStatus.destroy()
+        }
     }
 
     private fun setFormat(format: UiConfig.Format) {
@@ -1008,6 +1014,9 @@ internal class StoryFragment : Fragment(), StoryStatusView.UserInteractionListen
 
     override fun onDestroyView() {
         super.onDestroyView()
+        touchListener.destroy()
+        reverse.setOnTouchListener(null)
+        skip.setOnTouchListener(null)
         if (storiesStatus != null)
             storiesStatus.destroy()
     }
